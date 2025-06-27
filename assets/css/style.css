@@ -1,0 +1,170 @@
+/* Tailwind directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f8fafc;
+}
+
+/* Calendar customization */
+/* Calendar styling */
+.fc {
+    font-family: inherit;
+}
+
+.fc-header-toolbar {
+    margin-bottom: 1.5rem !important;
+    padding: 0 !important;
+}
+
+.fc-toolbar-chunk {
+    display: flex;
+    align-items: center;
+}
+
+.fc-button {
+    background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+    border: none !important;
+    border-radius: 0.75rem !important;
+    padding: 0.5rem 1rem !important;
+    margin: 0 0.25rem !important;
+    font-weight: 600 !important;
+    font-size: 0.875rem !important;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2) !important;
+    transition: all 0.2s ease !important;
+}
+
+.fc-button:hover {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3) !important;
+}
+
+.fc-button:disabled {
+    background: #e2e8f0 !important;
+    color: #94a3b8 !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.fc-toolbar-title {
+    font-size: 1.75rem !important;
+    font-weight: 700 !important;
+    color: #1e293b !important;
+    margin: 0 1rem !important;
+}
+
+.fc-daygrid-day {
+    transition: background-color 0.2s ease !important;
+}
+
+.fc-daygrid-day:hover {
+    background-color: #f8fafc !important;
+}
+
+.fc-daygrid-day-number {
+    color: #475569 !important;
+    font-weight: 600 !important;
+    padding: 0.5rem !important;
+}
+
+.fc-day-today {
+    background-color: #eff6ff !important;
+    border: 2px solid #3b82f6 !important;
+}
+
+.fc-day-today .fc-daygrid-day-number {
+    color: #1d4ed8 !important;
+    font-weight: 700 !important;
+}
+
+.fc-event {
+    border: none !important;
+    border-radius: 0.5rem !important;
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    margin: 0.125rem 0 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+}
+
+.fc-event:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+.fc-daygrid-block-event .fc-event-title {
+    font-weight: 600 !important;
+}
+
+/* Status-based event colors */
+.fc-event[data-status="confirmed"] {
+    background-color: #10b981 !important;
+    color: white !important;
+}
+
+.fc-event[data-status="pending"] {
+    background-color: #f59e0b !important;
+    color: white !important;
+}
+
+.fc-event[data-status="completed"] {
+    background-color: #3b82f6 !important;
+    color: white !important;
+}
+
+.fc-event[data-status="cancelled"] {
+    background-color: #ef4444 !important;
+    color: white !important;
+}
+
+/* Day appointments styling */
+#day-appointments {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.appointment-card {
+    transition: all 0.2s ease;
+}
+
+.appointment-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Form styling */
+.form-input {
+    transition: border-color 0.2s ease-in-out;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Button transitions */
+.btn {
+    transition: all 0.2s ease-in-out;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+    .mobile-stack {
+        flex-direction: column;
+    }
+    
+    .mobile-stack > * {
+        margin-bottom: 0.5rem;
+    }
+    
+    .mobile-stack > *:last-child {
+        margin-bottom: 0;
+    }
+}
