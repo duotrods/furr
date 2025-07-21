@@ -279,7 +279,7 @@ $recentAppointments = getAllAppointments('confirmed');
             </div>
 
             <!-- Main Chart Showing All Services -->
-            <div id="grid-chart" class=""></div>
+            <div id="grid-chart" class="w-full aspect-[16/9] p-2 md:p-6"></div>
 
             <div
                 class="grid grid-cols-1 items-center border-gray-200 border-t dark:border-gray-700 justify-between mt-5">
@@ -550,7 +550,7 @@ $recentAppointments = getAllAppointments('confirmed');
             position: 'bottom',
             horizontalAlign: 'center',
             itemMargin: {
-                horizontal: 8,
+                horizontal: 16,
                 vertical: 8
             }
         },
