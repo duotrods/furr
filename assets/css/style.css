@@ -112,7 +112,7 @@ body {
     background-color: #f59e0b !important;
     color: white !important;
 }
-
+ 
 .fc-event[data-status="completed"] {
     background-color: #3b82f6 !important;
     color: white !important;

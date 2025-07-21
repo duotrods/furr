@@ -7,7 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
-$appointment_id = (int)$_POST['appointment_id'];
+$appointment_id = (int) $_POST['appointment_id'];
 
 // Get appointment details
 $appointment = getAppointmentById($appointment_id);
@@ -21,7 +21,7 @@ if (!$appointment) {
 try {
     $stmt = $pdo->prepare("UPDATE appointments SET status = 'confirmed' WHERE id = ?");
     $stmt->execute([$appointment_id]);
-    
+
     // Send confirmation email to customer
     $subject = "Appointment Confirmed";
     $body = "Hello {$appointment['first_name']},<br><br>
@@ -34,9 +34,17 @@ try {
             Please arrive 10 minutes before your scheduled time. If you need to cancel or reschedule, please contact us at least 24 hours in advance.<br><br>
             Best regards,<br>
             The FurCare Team";
-    
+
     sendEmail($appointment['email'], $subject, $body);
-    
+
+    // Create notification
+    $notificationTitle = "Appointment Confirmed";
+    $notificationMessage = "Your appointment for {$appointment['pet_name']} on " .
+        formatDate($appointment['appointment_date']) . " at " .
+        formatTime($appointment['appointment_time']) . " has been confirmed!";
+
+    createNotification($appointment['user_id'], $notificationTitle, $notificationMessage);
+
     $_SESSION['success_message'] = 'Appointment confirmed successfully.';
     header('Location: ' . BASE_URL . '/admin/appointments.php');
     exit();

@@ -14,12 +14,12 @@ if (!validateCSRFToken($_POST['csrf_token'])) {
     exit();
 }
 
-$product_id = (int)$_POST['product_id'];
+$product_id = (int) $_POST['product_id'];
 $name = sanitize($_POST['name']);
-$category_id = (int)$_POST['category_id'];
+$category_id = (int) $_POST['category_id'];
 $description = sanitize($_POST['description']);
-$price = (float)$_POST['price'];
-$stock = (int)$_POST['stock'];
+$price = (float) $_POST['price'];
+$stock = (int) $_POST['stock'];
 
 // Validate inputs
 $errors = [];
@@ -73,7 +73,7 @@ try {
                           SET category_id = ?, name = ?, description = ?, price = ?, stock = ?, image = ?
                           WHERE id = ?");
     $stmt->execute([$category_id, $name, $description, $price, $stock, $image, $product_id]);
-    
+
     $_SESSION['success_message'] = 'Product updated successfully!';
     header('Location: ' . BASE_URL . '/admin/products.php');
     exit();

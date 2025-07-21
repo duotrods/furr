@@ -4,16 +4,15 @@
 <?php require_once __DIR__ . '/../includes/header.php'; ?>
 
 <div class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-    <div class="container mx-auto px-6 py-8">
-        <!-- Header Section -->
-        <div class="mb-10">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h1 class="text-4xl font-bold text-slate-800 mb-3">Appointment Calendar</h1>
-                    <p class="text-slate-600 text-lg">Manage and view all your appointments in one place</p>
-                </div>
-                <div
-                    >
+  <div class="container mx-auto px-6 py-8">
+    <!-- Header Section -->
+    <div class="mb-10">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-4xl font-bold text-slate-800 mb-3">Appointment Calendar</h1>
+          <p class="text-slate-600 text-lg">Manage and view all your appointments in one place</p>
+        </div>
+        <div>
           <a href="appointments.php"
             class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
             <i class="fas fa-arrow-left mr-2"></i>

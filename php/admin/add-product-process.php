@@ -16,10 +16,12 @@ if (!validateCSRFToken($_POST['csrf_token'])) {
 
 // Sanitize inputs
 $name = sanitize($_POST['name']);
-$category_id = (int)$_POST['category_id'];
+$category_id = (int) $_POST['category_id'];
 $description = sanitize($_POST['description']);
-$price = (float)$_POST['price'];
-$stock = (int)$_POST['stock'];
+$batchno = (int) $_POST['batchno'];
+$expiry = sanitize($_POST['expiry']);
+$price = (float) $_POST['price'];
+$stock = (int) $_POST['stock'];
 
 // Validate inputs
 $errors = [];
@@ -34,6 +36,16 @@ if (empty($category_id)) {
 
 if (empty($price) || $price <= 0) {
     $errors[] = 'Valid price is required.';
+}
+
+if ($batchno <= 0) {
+    $errors[] = 'Batch number must be a positive integer.';
+}
+
+if (empty($expiry)) {
+    $errors[] = 'Expiration date is required.';
+} elseif (strtotime($expiry) < strtotime('today')) {
+    $errors[] = 'Expiration date cannot be in the past.';
 }
 
 if ($stock < 0) {
@@ -60,10 +72,10 @@ if (!empty($_FILES['image']['name'])) {
 // Insert product
 try {
     $stmt = $pdo->prepare("INSERT INTO products 
-                          (category_id, name, description, price, stock, image) 
-                          VALUES (?, ?, ?, ?, ?, ?)");
-    $stmt->execute([$category_id, $name, $description, $price, $stock, $image]);
-    
+                          (category_id, name, description, price, stock, image, batchno, expiry) 
+                          VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->execute([$category_id, $name, $description, $price, $stock, $image, $batchno, $expiry]);
+
     $_SESSION['success_message'] = 'Product added successfully!';
     header('Location: ' . BASE_URL . '/admin/products.php');
     exit();
@@ -72,7 +84,7 @@ try {
     if ($image) {
         @unlink("../../assets/uploads/$image");
     }
-    
+
     $_SESSION['error_message'] = 'Failed to add product. Please try again.';
     header('Location: ' . BASE_URL . '/admin/add-product.php');
     exit();

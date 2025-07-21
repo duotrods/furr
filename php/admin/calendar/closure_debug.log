@@ -1,0 +1,17 @@
+{"date":"2025-07-14","reason":"Test"}
+DB Connection: OK
+Insert Result: Success
+Last Insert ID: 1
+Row Count: 1{"date":"2025-07-15","reason":"Test"}
+DB Connection: OK
+Insert Result: Success
+Last Insert ID: 2
+Row Count: 1{"date":"2025-06-30","reason":""}
+DB Connection: OK
+Insert Result: Success
+Last Insert ID: 3
+Row Count: 1{"date":"2025-07-31","reason":""}
+DB Connection: OK
+Insert Result: Success
+Last Insert ID: 4
+Row Count: 1

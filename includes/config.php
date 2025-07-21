@@ -31,18 +31,27 @@ require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/functions.php';
 
-function getOrderById($order_id) {
+function getOrderById($order_id)
+{
     global $pdo;
     $stmt = $pdo->prepare("SELECT * FROM orders WHERE id = ?");
     $stmt->execute([$order_id]);
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
-function getUserById($user_id) {
+function getUserById($user_id)
+{
     global $pdo;
     $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
     $stmt->execute([$user_id]);
     return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+function formatDateTime($dateString)
+{
+    if (empty($dateString))
+        return '';
+    $date = new DateTime($dateString);
+    return $date->format('M j, Y g:i A');
 }
 
 ?>

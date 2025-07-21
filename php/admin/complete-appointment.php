@@ -10,7 +10,7 @@ if (!isset($_POST['appointment_id']) || !is_numeric($_POST['appointment_id'])) {
     exit();
 }
 
-$appointment_id = (int)$_POST['appointment_id'];
+$appointment_id = (int) $_POST['appointment_id'];
 
 try {
     // Begin transaction
@@ -75,9 +75,18 @@ try {
         $message .= "Notes: {$appointment['notes']}\n\n";
         $message .= "Thank you for choosing FurCare!\n\n";
         $message .= "Best regards,\nThe FurCare Team";
-        
+
         sendEmail($appointment['email'], $subject, $message);
+
+        // Create notification
+        $notificationTitle = "Your FurCare Appointment is Complete";
+        $notificationMessage = "Your {$appointment['service_name']} appointment for {$appointment['pet_name']} " .
+            formatDate($appointment['appointment_date']) . " at " .
+            formatTime($appointment['appointment_time']) . " has been completed";
+
+        createNotification($appointment['user_id'], $notificationTitle, $notificationMessage);
     }
+
 
     // Commit transaction
     $pdo->commit();
