@@ -279,13 +279,13 @@ $recentAppointments = getAllAppointments('confirmed');
             </div>
 
             <!-- Main Chart Showing All Services -->
-            <div id="grid-chart"></div>
+            <div id="grid-chart" class=""></div>
 
             <div
                 class="grid grid-cols-1 items-center border-gray-200 border-t dark:border-gray-700 justify-between mt-5">
-                <div class="flex justify-between items-center pt-5">
-                    <!-- Button -->
-                    <button id="dropdownDefaultButton" data-dropdown-toggle="lastDaysdropdown"
+                <!-- <div class="flex justify-between items-center pt-5"> -->
+                <!-- Button -->
+                <!-- <button id="dropdownDefaultButton" data-dropdown-toggle="lastDaysdropdown"
                         data-dropdown-placement="bottom"
                         class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 text-center inline-flex items-center dark:hover:text-white"
                         type="button">
@@ -295,9 +295,9 @@ $recentAppointments = getAllAppointments('confirmed');
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="m1 1 4 4 4-4" />
                         </svg>
-                    </button>
-                    <!-- Dropdown menu -->
-                    <div id="lastDaysdropdown"
+                    </button> -->
+                <!-- Dropdown menu -->
+                <!-- <div id="lastDaysdropdown"
                         class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44 dark:bg-gray-700">
                         <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
                             aria-labelledby="dropdownDefaultButton">
@@ -335,7 +335,7 @@ $recentAppointments = getAllAppointments('confirmed');
                                 d="m1 9 4-4-4-4" />
                         </svg>
                     </a>
-                </div>
+                </div> -->
             </div>
         </div>
 
@@ -432,9 +432,9 @@ $recentAppointments = getAllAppointments('confirmed');
             </div>
             <div id="column-chart"></div>
             <div class="grid grid-cols-1 items-center border-gray-200 border-t dark:border-gray-700 justify-between">
-                <div class="flex justify-between items-center pt-5">
-                    <!-- Button -->
-                    <button id="dropdownDefaultButton" data-dropdown-toggle="lastDaysdropdown"
+                <!-- <div class="flex justify-between items-center pt-5"> -->
+                <!-- Button -->
+                <!-- <button id="dropdownDefaultButton" data-dropdown-toggle="lastDaysdropdown"
                         data-dropdown-placement="bottom"
                         class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 text-center inline-flex items-center dark:hover:text-white"
                         type="button">
@@ -444,9 +444,9 @@ $recentAppointments = getAllAppointments('confirmed');
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="m1 1 4 4 4-4" />
                         </svg>
-                    </button>
-                    <!-- Dropdown menu -->
-                    <div id="lastDaysdropdown"
+                    </button> -->
+                <!-- Dropdown menu -->
+                <!-- <div id="lastDaysdropdown"
                         class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44 dark:bg-gray-700">
                         <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
                             aria-labelledby="dropdownDefaultButton">
@@ -474,8 +474,8 @@ $recentAppointments = getAllAppointments('confirmed');
                                     90 days</a>
                             </li>
                         </ul>
-                    </div>
-                    <a href="#"
+                    </div> -->
+                <!-- <a href="#"
                         class="uppercase text-sm font-semibold inline-flex items-center rounded-lg text-blue-600 hover:text-blue-700 dark:hover:text-blue-500  hover:bg-gray-100 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700 px-3 py-2">
                         Sales Report
                         <svg class="w-2.5 h-2.5 ms-1.5 rtl:rotate-180" aria-hidden="true"
@@ -483,8 +483,8 @@ $recentAppointments = getAllAppointments('confirmed');
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="m1 9 4-4-4-4" />
                         </svg>
-                    </a>
-                </div>
+                    </a> -->
+                <!-- </div> -->
             </div>
         </div>
     </div>
