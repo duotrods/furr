@@ -5,8 +5,11 @@
 <?php
 $appointmentCounts = getAppointmentCounts();
 $recentAppointments = getAllAppointments('confirmed');
-?>
 
+// Initialize $products properly
+$category_id = $_GET['category_id'] ?? null;
+$products = $category_id ? getProductsByCategory($category_id) : getAllProducts();
+?>
 
 
 <div class="min-h-screen bg-gray-50">
@@ -118,9 +121,7 @@ $recentAppointments = getAllAppointments('confirmed');
         </div>
     </div>
 
-
-    <!-- charts -->
-
+    <!-- charts for appointments and Product -->
     <div class="container mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <!-- chart #1 -->
         <div class="w-full bg-white rounded-xl shadow-md border border-gray-100 p-4 md:p-6">
@@ -286,56 +287,56 @@ $recentAppointments = getAllAppointments('confirmed');
                 <!-- <div class="flex justify-between items-center pt-5"> -->
                 <!-- Button -->
                 <!-- <button id="dropdownDefaultButton" data-dropdown-toggle="lastDaysdropdown"
-                        data-dropdown-placement="bottom"
-                        class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 text-center inline-flex items-center dark:hover:text-white"
-                        type="button">
-                        Last 7 days
-                        <svg class="w-2.5 m-2.5 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                            fill="none" viewBox="0 0 10 6">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="m1 1 4 4 4-4" />
-                        </svg>
-                    </button> -->
+                            data-dropdown-placement="bottom"
+                            class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 text-center inline-flex items-center dark:hover:text-white"
+                            type="button">
+                            Last 7 days
+                            <svg class="w-2.5 m-2.5 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                fill="none" viewBox="0 0 10 6">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="m1 1 4 4 4-4" />
+                            </svg>
+                        </button> -->
                 <!-- Dropdown menu -->
                 <!-- <div id="lastDaysdropdown"
-                        class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44 dark:bg-gray-700">
-                        <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
-                            aria-labelledby="dropdownDefaultButton">
-                            <li>
-                                <a href="#"
-                                    class="hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-black">Yesterday</a>
-                            </li>
-                            <li>
-                                <a href="#"
-                                    class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-black">Today</a>
-                            </li>
-                            <li>
-                                <a href="#"
-                                    class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-black">Last
-                                    7 days</a>
-                            </li>
-                            <li>
-                                <a href="#"
-                                    class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-black">Last
-                                    30 days</a>
-                            </li>
-                            <li>
-                                <a href="#"
-                                    class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-blacke">Last
-                                    90 days</a>
-                            </li>
-                        </ul>
-                    </div>
-                    <a href="#"
-                        class="uppercase text-sm font-semibold inline-flex items-center rounded-lg text-blue-600 hover:text-blue-700 dark:hover:text-blue-500  hover:bg-gray-100 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700 px-3 py-2">
-                        Sales Report
-                        <svg class="w-2.5 h-2.5 ms-1.5 rtl:rotate-180" aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="m1 9 4-4-4-4" />
-                        </svg>
-                    </a>
-                </div> -->
+                            class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44 dark:bg-gray-700">
+                            <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
+                                aria-labelledby="dropdownDefaultButton">
+                                <li>
+                                    <a href="#"
+                                        class="hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-black">Yesterday</a>
+                                </li>
+                                <li>
+                                    <a href="#"
+                                        class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-black">Today</a>
+                                </li>
+                                <li>
+                                    <a href="#"
+                                        class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-black">Last
+                                        7 days</a>
+                                </li>
+                                <li>
+                                    <a href="#"
+                                        class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-black">Last
+                                        30 days</a>
+                                </li>
+                                <li>
+                                    <a href="#"
+                                        class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-blacke">Last
+                                        90 days</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <a href="#"
+                            class="uppercase text-sm font-semibold inline-flex items-center rounded-lg text-blue-600 hover:text-blue-700 dark:hover:text-blue-500  hover:bg-gray-100 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700 px-3 py-2">
+                            Sales Report
+                            <svg class="w-2.5 h-2.5 ms-1.5 rtl:rotate-180" aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="m1 9 4-4-4-4" />
+                            </svg>
+                        </a>
+                    </div> -->
             </div>
         </div>
 
@@ -435,258 +436,115 @@ $recentAppointments = getAllAppointments('confirmed');
                 <!-- <div class="flex justify-between items-center pt-5"> -->
                 <!-- Button -->
                 <!-- <button id="dropdownDefaultButton" data-dropdown-toggle="lastDaysdropdown"
-                        data-dropdown-placement="bottom"
-                        class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 text-center inline-flex items-center dark:hover:text-white"
-                        type="button">
-                        Last 7 days
-                        <svg class="w-2.5 m-2.5 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                            fill="none" viewBox="0 0 10 6">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="m1 1 4 4 4-4" />
-                        </svg>
-                    </button> -->
+                            data-dropdown-placement="bottom"
+                            class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 text-center inline-flex items-center dark:hover:text-white"
+                            type="button">
+                            Last 7 days
+                            <svg class="w-2.5 m-2.5 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                fill="none" viewBox="0 0 10 6">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="m1 1 4 4 4-4" />
+                            </svg>
+                        </button> -->
                 <!-- Dropdown menu -->
                 <!-- <div id="lastDaysdropdown"
-                        class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44 dark:bg-gray-700">
-                        <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
-                            aria-labelledby="dropdownDefaultButton">
-                            <li>
-                                <a href="#"
-                                    class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Yesterday</a>
-                            </li>
-                            <li>
-                                <a href="#"
-                                    class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Today</a>
-                            </li>
-                            <li>
-                                <a href="#"
-                                    class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Last
-                                    7 days</a>
-                            </li>
-                            <li>
-                                <a href="#"
-                                    class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Last
-                                    30 days</a>
-                            </li>
-                            <li>
-                                <a href="#"
-                                    class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Last
-                                    90 days</a>
-                            </li>
-                        </ul>
-                    </div> -->
+                            class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44 dark:bg-gray-700">
+                            <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
+                                aria-labelledby="dropdownDefaultButton">
+                                <li>
+                                    <a href="#"
+                                        class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Yesterday</a>
+                                </li>
+                                <li>
+                                    <a href="#"
+                                        class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Today</a>
+                                </li>
+                                <li>
+                                    <a href="#"
+                                        class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Last
+                                        7 days</a>
+                                </li>
+                                <li>
+                                    <a href="#"
+                                        class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Last
+                                        30 days</a>
+                                </li>
+                                <li>
+                                    <a href="#"
+                                        class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Last
+                                        90 days</a>
+                                </li>
+                            </ul>
+                        </div> -->
                 <!-- <a href="#"
-                        class="uppercase text-sm font-semibold inline-flex items-center rounded-lg text-blue-600 hover:text-blue-700 dark:hover:text-blue-500  hover:bg-gray-100 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700 px-3 py-2">
-                        Sales Report
-                        <svg class="w-2.5 h-2.5 ms-1.5 rtl:rotate-180" aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="m1 9 4-4-4-4" />
-                        </svg>
-                    </a> -->
+                            class="uppercase text-sm font-semibold inline-flex items-center rounded-lg text-blue-600 hover:text-blue-700 dark:hover:text-blue-500  hover:bg-gray-100 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700 px-3 py-2">
+                            Sales Report
+                            <svg class="w-2.5 h-2.5 ms-1.5 rtl:rotate-180" aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="m1 9 4-4-4-4" />
+                            </svg>
+                        </a> -->
                 <!-- </div> -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Inventory Chart -->
+    <div class="container mx-auto px-6 gap-6 mb-8">
+        <div class="w-full bg-white rounded-xl shadow-md border border-gray-100 p-4 md:p-6">
+            <div>
+                <div class="flex justify-between pb-4 mb-4 border-b border-gray-200">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center me-3">
+                            <i class="fas fa-boxes text-gray-500 text-xl"></i>
+                        </div>
+                        <div>
+                            <h5 class="leading-none text-2xl font-bold text-gray-900 pb-1">
+                                <?php echo array_sum(array_column($products, 'stock')); ?>
+                            </h5>
+                            <p class="text-sm font-normal text-gray-500">Total Products in Stock</p>
+                        </div>
+                    </div>
+                    <div>
+                        <span
+                            class="bg-blue-100 text-blue-800 text-xs font-medium inline-flex items-center px-2.5 py-1 rounded-md">
+                            <i class="fas fa-chart-line mr-1"></i>
+                            Stock Overview
+                        </span>
+                    </div>
+                </div>
+                <div id="inventory-chart"></div>
+                <script>
+                    // Pass the PHP data to JavaScript
+                    window.productChartData = {
+                        products: <?php echo json_encode(array_column($products, 'name')); ?>,
+                        stocks: <?php echo json_encode(array_column($products, 'stock')); ?>,
+                        categories: <?php echo json_encode(array_map(function ($p) {
+                            return getProductCategoryById($p['category_id'])['name'];
+                        }, $products)); ?>,
+                        totalStock: <?php echo array_sum(array_column($products, 'stock')); ?>
+                    };
+                </script>
             </div>
         </div>
     </div>
 </div>
 
+
+
 <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.46.0/dist/apexcharts.min.js"></script>
-<script>
-
-    const chartLabels = <?php echo $js_chart_labels; ?>;
-    const serviceChartData = <?php echo $js_service_chart_data; ?>;
-
-    // Color palette for 6 services
-    const serviceColors = [
-        '#1A56DB', // Blue
-        '#7E3AF2', // Purple
-        '#F05252', // Red
-        '#F59E0B', // Yellow
-        '#10B981', // Green
-        '#3F83F8'  // Light Blue
-    ];
-
-    // Chart options showing all services
-    const chartOptions = {
-        grid: {
-            show: true,
-            strokeDashArray: 4,
-            padding: {
-                left: 10,
-                right: 2,
-                top: 0
-            },
-        },
-        series: serviceChartData.map((service, index) => ({
-            name: service.name,
-            data: service.data,
-            color: serviceColors[index % serviceColors.length]
-        })),
-        chart: {
-            height: "100%",
-            maxWidth: "100%",
-            type: "area",
-            fontFamily: "Inter, sans-serif",
-            dropShadow: {
-                enabled: false,
-            },
-            toolbar: {
-                show: false,
-            },
-        },
-        tooltip: {
-            enabled: true,
-            x: {
-                show: false,
-            },
-            y: {
-                formatter: function (value) {
-                    return '₱' + value.toFixed(2);
-                }
-            }
-        },
-        legend: {
-            show: true,
-            position: 'bottom',
-            horizontalAlign: 'center',
-            itemMargin: {
-                horizontal: 16,
-                vertical: 8
-            }
-        },
-        dataLabels: {
-            enabled: false,
-        },
-
-        stroke: {
-            width: 4,
-            curve: 'smooth'
-        },
-
-
-        xaxis: {
-            categories: chartLabels,
-            labels: {
-                show: true,
-            },
-            axisBorder: {
-                show: false,
-            },
-            axisTicks: {
-                show: false,
-            },
-        },
-        yaxis: {
-            show: true,
-            labels: {
-                formatter: function (value) {
-                    return '₱' + value.toFixed(2);
-                }
-            }
-        },
+<?php
+echo '<script>
+    var dashboardConfig = {
+        chartLabels: ' . $js_chart_labels . ',
+        serviceChartData: ' . $js_service_chart_data . ',
+        columnChartData: ' . json_encode($chart_data) . '
     };
+</script>';
+?>
 
-    // Initialize chart
-    if (document.getElementById("grid-chart") && typeof ApexCharts !== 'undefined') {
-        const chart = new ApexCharts(document.getElementById("grid-chart"), chartOptions);
-        chart.render();
-    }
-
-
-    const column = {
-        colors: ["#1A56DB", "#FDBA8C"],
-        series: [
-            {
-                name: "Product Sales",
-                color: "#1A56DB",
-                data: <?php echo json_encode($chart_data); ?>
-            }
-        ],
-        chart: {
-            type: "bar",
-            height: "320px",
-            fontFamily: "Inter, sans-serif",
-            toolbar: {
-                show: false,
-            },
-        },
-        plotOptions: {
-            bar: {
-                horizontal: false,
-                columnWidth: "70%",
-                borderRadiusApplication: "end",
-                borderRadius: 8,
-            },
-        },
-        tooltip: {
-            shared: true,
-            intersect: false,
-            style: {
-                fontFamily: "Inter, sans-serif",
-            },
-            y: {
-                formatter: function (value) {
-                    return '₱' + value.toFixed(2);
-                }
-            }
-        },
-        states: {
-            hover: {
-                filter: {
-                    type: "darken",
-                    value: 1,
-                },
-            },
-        },
-        stroke: {
-            show: true,
-            width: 0,
-            colors: ["transparent"],
-        },
-        grid: {
-            show: false,
-            strokeDashArray: 4,
-            padding: {
-                left: 2,
-                right: 2,
-                top: -14
-            },
-        },
-        dataLabels: {
-            enabled: false,
-        },
-        legend: {
-            show: false,
-        },
-        xaxis: {
-            floating: false,
-            labels: {
-                show: true,
-                style: {
-                    fontFamily: "Inter, sans-serif",
-                    cssClass: 'text-xs font-normal fill-gray-500 dark:fill-gray-400'
-                }
-            },
-            axisBorder: {
-                show: false,
-            },
-            axisTicks: {
-                show: false,
-            },
-        },
-        yaxis: {
-            show: false,
-        },
-        fill: {
-            opacity: 1,
-        },
-    };
-
-    if (document.getElementById("column-chart") && typeof ApexCharts !== 'undefined') {
-        const chart = new ApexCharts(document.getElementById("column-chart"), column);
-        chart.render();
-    }
-</script>
+<script src="../assets/js/charts.js"></script>
 
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>

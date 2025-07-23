@@ -121,9 +121,9 @@ $categories = getProductCategories();
                             <th class="px-8 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
                                 Details</th>
                             <th class="px-8 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
-                                Expiration Date</th>
+                                Batch No</th>
                             <th class="px-8 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
-                                Category</th>
+                                Expiration Date</th>
                             <th class="px-8 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
                                 Price</th>
                             <th class="px-8 py-4 text-xs font-bold text-gray-700 uppercase tracking-wider">
@@ -160,15 +160,21 @@ $categories = getProductCategories();
                                 <td class="px-8 py-6">
                                     <div class="flex items-center space-x-2">
                                         <span
-                                            class="text-sm font-semibold text-gray-900"><?php echo $product['expiry']; ?></span>
+                                            class="text-sm font-semibold text-gray-900"><?php echo $product['batchno']; ?></span>
                                     </div>
                                 </td>
                                 <td class="px-8 py-6">
+                                    <div class="flex items-center space-x-2">
+                                        <span
+                                            class="text-sm font-semibold text-gray-900"><?php echo $product['expiry']; ?></span>
+                                    </div>
+                                </td>
+                                <!-- <td class="px-8 py-6">
                                     <span
                                         class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                         <i class="fas fa-tag mr-1"></i><?php echo $category['name']; ?>
                                     </span>
-                                </td>
+                                </td> -->
                                 <td class="px-8 py-6">
                                     <div class="text-sm font-semibold text-green-600">
                                         ₱<?php echo number_format($product['price'], 2); ?></div>
@@ -179,14 +185,30 @@ $categories = getProductCategories();
                                             class="text-sm font-semibold text-gray-900"><?php echo $product['stock']; ?></span>
                                     </div>
                                 </td>
+
                                 <td class="px-8 py-6">
                                     <div class="flex items-center space-x-2">
-                                        <a
-                                            class="px-2 py-1 rounded-full text-xs font-medium <?php echo $product['stock'] > 10 ? 'bg-green-100 text-green-800' : ($product['stock'] > 5 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'); ?>">
-                                            <?php echo $product['stock'] > 10 ? 'In Stock' : ($product['stock'] > 5 ? 'Low Stock' : 'Very Low'); ?>
+                                        <a class="px-2 py-1 rounded-full text-xs font-medium <?php
+                                        echo $product['stock'] == 0
+                                            ? 'bg-gray-100 text-gray-600'
+                                            : ($product['stock'] > 10
+                                                ? 'bg-green-100 text-green-800'
+                                                : ($product['stock'] > 5
+                                                    ? 'bg-yellow-100 text-yellow-800'
+                                                    : 'bg-red-100 text-red-800')); ?>">
+                                            <?php
+                                            echo $product['stock'] == 0
+                                                ? 'Out of Stock'
+                                                : ($product['stock'] > 10
+                                                    ? 'In Stock'
+                                                    : ($product['stock'] > 5
+                                                        ? 'Low Stock'
+                                                        : 'Very Low'));
+                                            ?>
                                         </a>
                                     </div>
                                 </td>
+
                                 <td class="px-8 py-6">
                                     <div class="flex items-center space-x-3">
                                         <a href="edit-product.php?id=<?php echo $product['id']; ?>"

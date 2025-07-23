@@ -25,8 +25,8 @@ $appointments = $status == 'all' ? archivedAppointments() : archivedAppointments
                     </a>
                     <a href="appointmenarchive.php"
                         class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5">
-                        <i class="fas fa-trash mr-2"></i>
-                        Trash
+                        <i class="fas fa-archive mr-2"></i>
+                        Archive
                     </a>
                 </div>
             </div>
