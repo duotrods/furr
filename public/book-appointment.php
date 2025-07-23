@@ -143,6 +143,20 @@ if (!isset($_GET['service_id']) || !$service = getServiceById($_GET['service_id'
                                             <option value="Other">🐾 Other</option>
                                         </select>
                                     </div>
+
+                                    <div class="space-y-2">
+                                        <label for="pet_size" class="block text-slate-700 font-semibold text-sm">
+                                            Pet Type <span class="text-red-500">*</span>
+                                        </label>
+                                        <select id="pet_size" name="pet_size" required
+                                            class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-slate-50 focus:bg-white">
+                                            <option value="">Select Pet Size</option>
+                                            <option value="Small">Small</option>
+                                            <option value="Medium">Medium</option>
+                                            <option value="Large">Large</option>
+                                            <option value="Extra Large">Extra Large</option>
+                                        </select>
+                                    </div>
                                 </div>
                                 <!-- Personal Information Section -->
                                 <div class="space-y-6">

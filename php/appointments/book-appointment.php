@@ -20,6 +20,7 @@ $pet_name = sanitize($_POST['pet_name']);
 $email = sanitize($_POST['email']);
 $contact_number = sanitize($_POST['contact_number']);
 $pet_type = sanitize($_POST['pet_type']);
+$pet_size = sanitize($_POST['pet_size']);
 $appointment_date = sanitize($_POST['appointment_date']);
 $appointment_time = sanitize($_POST['appointment_time']);
 $notes = sanitize($_POST['notes']);
@@ -45,6 +46,11 @@ if (empty($contact_number)) {
 
 if (empty($pet_type)) {
     $errors[] = 'Pet type is required.';
+}
+
+
+if (empty($pet_size)) {
+    $errors[] = 'Pet Size is required.';
 }
 
 if (empty($appointment_date)) {
@@ -91,9 +97,9 @@ if ($stmt->fetch()) {
 // Insert appointment
 try {
     $stmt = $pdo->prepare("INSERT INTO appointments 
-                        (user_id, service_id, pet_name, email, contact_number, pet_type, appointment_date, appointment_time, notes, status) 
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')");
-    $stmt->execute([getUserId(), $service_id, $pet_name, $email, $contact_number, $pet_type, $appointment_date, $appointment_time, $notes]);
+                        (user_id, service_id, pet_name, email, contact_number, pet_type, pet_size, appointment_date, appointment_time, notes, status) 
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')");
+    $stmt->execute([getUserId(), $service_id, $pet_name, $email, $contact_number, $pet_type, $pet_size, $appointment_date, $appointment_time, $notes]);
 
     // Get appointment ID
     $appointment_id = $pdo->lastInsertId();
