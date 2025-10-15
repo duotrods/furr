@@ -6,6 +6,19 @@ if (!isset($_GET['service_id']) || !$service = getServiceById($_GET['service_id'
     header('Location: services.php');
     exit();
 }
+
+//fetch nato diri ang services para makuha nato ang sizes mabutang sa from inig mag book og appointment ang user.
+$allServices = getAllServices();
+$availableSizes = [];
+
+if ($allServices) {
+    foreach ($allServices as $s) {
+        if (!empty($s['size']) && !in_array($s['size'], $availableSizes)) {
+            $availableSizes[] = $s['size'];
+        }
+    }
+}
+
 ?>
 
 <?php require_once '../includes/header.php'; ?>
@@ -46,6 +59,11 @@ if (!isset($_GET['service_id']) || !$service = getServiceById($_GET['service_id'
                             <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
                                 <span class="text-slate-600 font-medium">Service</span>
                                 <span class="text-slate-800 font-semibold"><?php echo $service['name']; ?></span>
+                            </div>
+
+                            <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                                <span class="text-slate-600 font-medium">Size</span>
+                                <span class="text-green-600 font-bold text-lg"><?php echo $service['size']; ?></span>
                             </div>
 
                             <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
@@ -146,16 +164,13 @@ if (!isset($_GET['service_id']) || !$service = getServiceById($_GET['service_id'
 
                                     <div class="space-y-2">
                                         <label for="pet_size" class="block text-slate-700 font-semibold text-sm">
-                                            Pet Type <span class="text-red-500">*</span>
+                                            Pet Size <span class="text-red-500">*</span>
                                         </label>
-                                        <select id="pet_size" name="pet_size" required
-                                            class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-slate-50 focus:bg-white">
-                                            <option value="">Select Pet Size</option>
-                                            <option value="Small">Small</option>
-                                            <option value="Medium">Medium</option>
-                                            <option value="Large">Large</option>
-                                            <option value="Extra Large">Extra Large</option>
-                                        </select>
+                                        <input type="text" id="pet_size_display"
+                                            value="<?php echo htmlspecialchars($service['size']); ?>" readonly
+                                            class="w-full px-4 py-3 border border-slate-300 rounded-lg bg-gray-100 cursor-not-allowed">
+                                        <input type="hidden" name="pet_size"
+                                            value="<?php echo htmlspecialchars($service['size']); ?>">
                                     </div>
                                 </div>
                                 <!-- Personal Information Section -->
