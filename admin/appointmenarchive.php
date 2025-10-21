@@ -3,7 +3,18 @@ require_once __DIR__ . '/../includes/config.php';
 requireAdmin();
 
 // Delete appointments older than 15 days
-$pdo->exec("DELETE FROM appointments WHERE is_archived = TRUE AND archived_at < DATE_SUB(NOW(), INTERVAL 15 DAY)");
+$pdo->exec("
+    DELETE ah FROM appointment_history ah
+    INNER JOIN appointments a ON ah.appointment_id = a.id
+    WHERE a.is_archived = TRUE 
+    AND a.archived_at < DATE_SUB(NOW(), INTERVAL 15 DAY)
+");
+
+$pdo->exec("
+    DELETE FROM appointments 
+    WHERE is_archived = TRUE 
+    AND archived_at < DATE_SUB(NOW(), INTERVAL 15 DAY)
+");
 
 // Get archived appointments with proper joins
 $stmt = $pdo->prepare("
