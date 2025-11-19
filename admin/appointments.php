@@ -2,6 +2,13 @@
 <?php requireAdmin(); ?>
 
 <?php
+$pdo->exec("
+    UPDATE appointments 
+    SET is_archived = TRUE, archived_at = NOW() 
+    WHERE is_archived = FALSE 
+    AND appointment_date < DATE_SUB(NOW(), INTERVAL 2 MONTH)
+");
+
 $status = $_GET['status'] ?? 'all';
 $appointments = $status == 'all' ? archivedAppointments() : archivedAppointments($status);
 ?>
@@ -201,12 +208,6 @@ $appointments = $status == 'all' ? archivedAppointments() : archivedAppointments
                                             class="inline-flex items-center px-3 py-2 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-lg transition-all duration-200 hover:shadow-md">
                                             <i class="fas fa-eye mr-1"></i>
                                             View
-                                        </a>
-                                        <a href="../php/admin/appointment/archive-appointment.php?id=<?php echo $appointment['id']; ?>"
-                                            class="inline-flex items-center px-3 py-2 text-xs font-medium text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-lg transition-all duration-200 hover:shadow-md"
-                                            onclick="return confirm('Are you sure you want to archive this appointment?');">
-                                            <i class="fas fa-archive mr-1"></i>
-                                            Archive
                                         </a>
                                     </div>
                                 </td>
