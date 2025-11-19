@@ -4,8 +4,13 @@ require_once __DIR__ . '/../../includes/config.php';
 header('Content-Type: application/json');
 
 try {
-    // Get store closures from database
-    $stmt = $pdo->query("SELECT closure_date FROM store_closures WHERE closure_date >= CURDATE()");
+    // Get only FULL DAY closures from database (not partial closures)
+    $stmt = $pdo->query("
+        SELECT closure_date 
+        FROM store_closures 
+        WHERE closure_date >= CURDATE() 
+        AND closure_type = 'full_day'
+    ");
     $closedDates = $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
 
     // Add Sundays to closed dates for the next 6 months

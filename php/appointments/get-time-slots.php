@@ -10,7 +10,7 @@ if (!isset($_GET['date'])) {
 }
 
 $date = $_GET['date'];
-$service_id = $_GET['service_id'] ?? null; // Optional: Filter by service duration
+$service_id = $_GET['service_id'] ?? null;
 
 try {
     // 1. Validate date format
@@ -25,14 +25,29 @@ try {
         exit();
     }
 
-    // 3. Get business hours and time slot interval
+    // 3. Check for store closures
+    $stmt = $pdo->prepare("
+        SELECT closure_type, start_time, end_time 
+        FROM store_closures 
+        WHERE closure_date = ?
+    ");
+    $stmt->execute([$date]);
+    $closure = $stmt->fetch();
+
+    // 4. If full day closure, return empty
+    if ($closure && $closure['closure_type'] === 'full_day') {
+        echo json_encode([]);
+        exit();
+    }
+
+    // 5. Get business hours and time slot interval
     $business_hours = [
         'start' => '09:00:00', // 9 AM
         'end' => '17:00:00'    // 5 PM
     ];
     $slot_interval = 60; // minutes
 
-    // 4. Get existing appointments for the date
+    // 6. Get existing appointments for the date
     $stmt = $pdo->prepare("
         SELECT appointment_time 
         FROM appointments 
@@ -42,17 +57,32 @@ try {
     $stmt->execute([$date]);
     $booked_slots = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-    // 5. Calculate all possible time slots
+    // 7. Calculate all possible time slots
     $all_slots = generateTimeSlots(
         $business_hours['start'],
         $business_hours['end'],
         $slot_interval
     );
 
-    // 6. Filter out booked slots and return available ones
+    // 8. Filter out closed time slots for partial closures
+    if ($closure && $closure['closure_type'] === 'partial') {
+        $closed_start = strtotime($closure['start_time']);
+        $closed_end = strtotime($closure['end_time']);
+
+        $all_slots = array_filter($all_slots, function ($slot) use ($closed_start, $closed_end) {
+            $slot_time = strtotime($slot);
+            // Keep slots that are NOT within the closed time range
+            return $slot_time < $closed_start || $slot_time >= $closed_end;
+        });
+
+        // Re-index the array
+        $all_slots = array_values($all_slots);
+    }
+
+    // 9. Filter out booked slots
     $available_slots = array_diff($all_slots, $booked_slots);
 
-    // 7. If service duration is provided, filter slots that can accommodate it
+    // 10. If service duration is provided, filter slots that can accommodate it
     if ($service_id) {
         $service = getServiceById($service_id);
         $available_slots = filterSlotsByDuration($available_slots, $service['duration'], $slot_interval);
