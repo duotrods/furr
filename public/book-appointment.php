@@ -309,75 +309,114 @@ if ($allServices) {
 </div>
 
 <script>
-    document.getElementById('appointment_date').addEventListener('change', function () {
-        const date = this.value;
-        if (!date) return;
-
-        fetch(`../php/appointments/get-time-slots.php?date=${date}&service_id=<?php echo $service['id']; ?>`)
-            .then(response => response.json())
-            .then(data => {
-                const timeSelect = document.getElementById('appointment_time');
-                timeSelect.innerHTML = '<option value="">Select Time</option>';
-
-                if (data.length > 0) {
-                    data.forEach(time => {
-                        const option = document.createElement('option');
-                        option.value = time;
-                        option.textContent = formatTime(time);
-                        timeSelect.appendChild(option);
-                    });
-                } else {
-                    const option = document.createElement('option');
-                    option.textContent = 'No available time slots';
-                    option.disabled = true;
-                    timeSelect.appendChild(option);
-                }
-            });
-    });
-
-    function formatTime(timeStr) {
-        const [hours, minutes] = timeStr.split(':');
-        const hour = parseInt(hours);
-        const ampm = hour >= 12 ? 'PM' : 'AM';
-        const displayHour = hour % 12 || 12;
-        return `${displayHour}:${minutes} ${ampm}`;
-    }
-
     document.addEventListener('DOMContentLoaded', function () {
+        const dateInput = document.getElementById('appointment_date');
+        const timeSelect = document.getElementById('appointment_time');
+        const submitButton = document.querySelector('button[type="submit"]');
+        const warningDiv = document.getElementById('dateClosedWarning');
+
+        // Function to check if a date is Sunday
+        function isSunday(dateString) {
+            const date = new Date(dateString);
+            return date.getDay() === 0; // Sunday is 0
+        }
+
+        // Function to check if date is closed (Sunday or in closedDates)
+        function isDateClosed(dateString, closedDates) {
+            return isSunday(dateString) || closedDates.includes(dateString);
+        }
+
         // Fetch closed dates when page loads
         fetch('../php/appointments/check-closed-dates.php')
             .then(response => response.json())
             .then(closedDates => {
-                const dateInput = document.getElementById('appointment_date');
-
                 // Set min date to today
                 dateInput.min = new Date().toISOString().split('T')[0];
 
                 // Add event listener to prevent selecting closed dates
                 dateInput.addEventListener('input', function () {
                     const selectedDate = this.value;
-                    const warningDiv = document.getElementById('dateClosedWarning');
 
-                    if (closedDates.includes(selectedDate)) {
+                    if (isDateClosed(selectedDate, closedDates)) {
                         // Reset the date and show warning
                         this.value = '';
-                        warningDiv.classList.remove('hidden');
-                        document.getElementById('appointment_time').innerHTML = '<option value="">Select Time</option>';
-                        document.querySelector('button[type="submit"]').disabled = true;
+                        showClosedWarning(isSunday(selectedDate) ? 'Sundays' : 'this date');
+                        timeSelect.innerHTML = '<option value="">Select Time</option>';
+                        submitButton.disabled = true;
                     } else {
                         warningDiv.classList.add('hidden');
-                        document.querySelector('button[type="submit"]').disabled = false;
+                        submitButton.disabled = false;
+                        // Fetch available time slots for valid date
+                        fetchTimeSlots(selectedDate);
                     }
                 });
 
-                // For browsers that support the 'disabledDates' property
-                if ('disabledDates' in dateInput) {
-                    dateInput.disabledDates = closedDates;
-                }
+                // Also check on change (for browser date pickers)
+                dateInput.addEventListener('change', function () {
+                    const selectedDate = this.value;
+                    if (selectedDate && !isDateClosed(selectedDate, closedDates)) {
+                        fetchTimeSlots(selectedDate);
+                    }
+                });
             })
             .catch(error => {
                 console.error('Error loading closed dates:', error);
             });
+
+        // Function to show closed warning with specific message
+        function showClosedWarning(reason) {
+            warningDiv.classList.remove('hidden');
+            const messageElement = warningDiv.querySelector('p:last-child');
+            messageElement.textContent = `We're closed on ${reason}. Please choose another available date for your appointment.`;
+        }
+
+        // Function to fetch time slots
+        function fetchTimeSlots(date) {
+            if (!date) return;
+
+            fetch(`../php/appointments/get-time-slots.php?date=${date}&service_id=<?php echo $service['id']; ?>`)
+                .then(response => response.json())
+                .then(data => {
+                    timeSelect.innerHTML = '<option value="">Select Time</option>';
+
+                    if (data.error) {
+                        const option = document.createElement('option');
+                        option.textContent = 'Error loading time slots';
+                        option.disabled = true;
+                        timeSelect.appendChild(option);
+                        return;
+                    }
+
+                    if (data.length > 0) {
+                        data.forEach(time => {
+                            const option = document.createElement('option');
+                            option.value = time;
+                            option.textContent = formatTime(time);
+                            timeSelect.appendChild(option);
+                        });
+                    } else {
+                        const option = document.createElement('option');
+                        option.textContent = 'No available time slots';
+                        option.disabled = true;
+                        timeSelect.appendChild(option);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching time slots:', error);
+                    const option = document.createElement('option');
+                    option.textContent = 'Error loading time slots';
+                    option.disabled = true;
+                    timeSelect.appendChild(option);
+                });
+        }
+
+        function formatTime(timeStr) {
+            const [hours, minutes] = timeStr.split(':');
+            const hour = parseInt(hours);
+            const ampm = hour >= 12 ? 'PM' : 'AM';
+            const displayHour = hour % 12 || 12;
+            return `${displayHour}:${minutes} ${ampm}`;
+        }
     });
 </script>
 

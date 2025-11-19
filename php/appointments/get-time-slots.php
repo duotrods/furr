@@ -18,14 +18,21 @@ try {
         throw new Exception('Invalid date format');
     }
 
-    // 2. Get business hours and time slot interval
+    // 2. Check if it's Sunday (day 0)
+    $dateTime = new DateTime($date);
+    if ($dateTime->format('w') == 0) {
+        echo json_encode([]); // Return empty array for Sundays
+        exit();
+    }
+
+    // 3. Get business hours and time slot interval
     $business_hours = [
         'start' => '09:00:00', // 9 AM
         'end' => '17:00:00'    // 5 PM
     ];
     $slot_interval = 60; // minutes
 
-    // 3. Get existing appointments for the date
+    // 4. Get existing appointments for the date
     $stmt = $pdo->prepare("
         SELECT appointment_time 
         FROM appointments 
@@ -35,17 +42,17 @@ try {
     $stmt->execute([$date]);
     $booked_slots = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-    // 4. Calculate all possible time slots
+    // 5. Calculate all possible time slots
     $all_slots = generateTimeSlots(
         $business_hours['start'],
         $business_hours['end'],
         $slot_interval
     );
 
-    // 5. Filter out booked slots and return available ones
+    // 6. Filter out booked slots and return available ones
     $available_slots = array_diff($all_slots, $booked_slots);
 
-    // 6. If service duration is provided, filter slots that can accommodate it
+    // 7. If service duration is provided, filter slots that can accommodate it
     if ($service_id) {
         $service = getServiceById($service_id);
         $available_slots = filterSlotsByDuration($available_slots, $service['duration'], $slot_interval);
