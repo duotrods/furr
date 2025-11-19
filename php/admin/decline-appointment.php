@@ -1,57 +1,64 @@
 <?php
-require_once '../../includes/config.php';
+require_once __DIR__ . '/../../includes/config.php';
 requireAdmin();
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: ' . BASE_URL . '/admin/appointments.php');
-    exit();
-}
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $appointment_id = $_POST['appointment_id'] ?? '';
+    $decline_reason = $_POST['decline_reason'] ?? '';
 
-$appointment_id = (int) $_POST['appointment_id'];
+    if (!empty($appointment_id)) {
+        // First, get user_id and appointment details
+        $stmt = $pdo->prepare("
+            SELECT a.user_id, a.pet_name, s.name as service_name, a.appointment_date 
+            FROM appointments a 
+            JOIN services s ON a.service_id = s.id 
+            WHERE a.id = ?
+        ");
+        $stmt->execute([$appointment_id]);
+        $appointment = $stmt->fetch(PDO::FETCH_ASSOC);
 
-// Get appointment details
-$appointment = getAppointmentById($appointment_id);
-if (!$appointment) {
-    $_SESSION['error_message'] = 'Appointment not found.';
-    header('Location: ' . BASE_URL . '/admin/appointments.php');
-    exit();
-}
+        if ($appointment) {
+            // Update the appointment status and store the reason
+            $stmt = $pdo->prepare("
+                UPDATE appointments 
+                SET status = 'declined', 
+                    decline_reason = ?,
+                    updated_at = NOW() 
+                WHERE id = ?
+            ");
 
-// Update appointment status
-try {
-    $stmt = $pdo->prepare("UPDATE appointments SET status = 'declined' WHERE id = ?");
-    $stmt->execute([$appointment_id]);
+            if ($stmt->execute([$decline_reason, $appointment_id])) {
+                // Create notification for the user
+                $notification_stmt = $pdo->prepare("
+                    INSERT INTO notifications (user_id, title, message, created_at) 
+                    VALUES (?, 'Appointment Declined', ?, NOW())
+                ");
 
-    // Send notification email to customer
-    $subject = "Appointment Declined";
-    $body = "Hello {$appointment['first_name']},<br><br>
-            We regret to inform you that your appointment for {$appointment['pet_name']} has been declined.<br><br>
-            <strong>Appointment Details:</strong><br>
-            Service: {$appointment['service_name']}<br>
-            Date: " . formatDate($appointment['appointment_date']) . "<br>
-            Time: " . formatTime($appointment['appointment_time']) . "<br>
-            Pet: {$appointment['pet_name']} ({$appointment['pet_type']})<br><br>
-            Please contact us if you have any questions or would like to reschedule.<br><br>
-            Best regards,<br>
-            The FurCare Team";
+                $notification_message = "Your appointment for " . $appointment['pet_name'] .
+                    " (" . $appointment['service_name'] .
+                    ") on " . date('M j, Y', strtotime($appointment['appointment_date'])) .
+                    " has been declined.";
 
-    sendEmail($appointment['email'], $subject, $body);
+                if (!empty($decline_reason)) {
+                    $notification_message .= " Reason: " . $decline_reason;
+                } else {
+                    $notification_message .= " Please contact us for more information.";
+                }
 
-    // Create notification
-    $notificationTitle = "Appointment Declined";
-    $notificationMessage = "Hello {$appointment['first_name']},<br><br>
-            We regret to inform you that your appointment for {$appointment['pet_name']} has been declined." .
-        formatDate($appointment['appointment_date']) . " at " .
-        formatTime($appointment['appointment_time']) . " has been declined!";
+                $notification_stmt->execute([$appointment['user_id'], $notification_message]);
 
-    createNotification($appointment['user_id'], $notificationTitle, $notificationMessage);
+                $_SESSION['success'] = "Appointment declined successfully.";
+            } else {
+                $_SESSION['error'] = "Failed to decline appointment.";
+            }
+        } else {
+            $_SESSION['error'] = "Appointment not found.";
+        }
+    } else {
+        $_SESSION['error'] = "Invalid appointment ID.";
+    }
 
-    $_SESSION['success_message'] = 'Appointment declined successfully.';
-    header('Location: ' . BASE_URL . '/admin/appointments.php');
-    exit();
-} catch (PDOException $e) {
-    $_SESSION['error_message'] = 'Failed to decline appointment. Please try again.';
-    header('Location: ' . BASE_URL . '/admin/appointments.php');
-    exit();
+    header("Location: ../../admin/appointments.php");
+    exit;
 }
 ?>

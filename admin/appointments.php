@@ -184,15 +184,41 @@ $appointments = $status == 'all' ? archivedAppointments() : archivedAppointments
                                                     Confirm
                                                 </button>
                                             </form>
-                                            <form action="../php/admin/decline-appointment.php" method="POST" class="inline">
-                                                <input type="hidden" name="appointment_id"
-                                                    value="<?php echo $appointment['id']; ?>">
-                                                <button type="submit"
-                                                    class="inline-flex items-center px-3 py-2 text-xs font-medium text-red-700 bg-red-100 hover:bg-red-200 border border-red-300 rounded-lg transition-all duration-200 hover:shadow-md">
-                                                    <i class="fas fa-times mr-1"></i>
-                                                    Decline
-                                                </button>
-                                            </form>
+                                            <div id="declineModal"
+                                                class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+                                                <div class="bg-white rounded-2xl p-6 w-full max-w-md mx-4">
+                                                    <h3 class="text-xl font-bold text-slate-800 mb-4">Decline Appointment</h3>
+                                                    <form id="declineForm" action="../php/admin/decline-appointment.php"
+                                                        method="POST">
+                                                        <input type="hidden" name="appointment_id" id="declineAppointmentId">
+                                                        <div class="mb-4">
+                                                            <label for="decline_reason"
+                                                                class="block text-sm font-medium text-slate-700 mb-2">
+                                                                Reason for declining:
+                                                            </label>
+                                                            <textarea name="decline_reason" id="decline_reason" rows="4"
+                                                                class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                                placeholder="Please provide a reason for declining this appointment..."
+                                                                required></textarea>
+                                                        </div>
+                                                        <div class="flex justify-end gap-3">
+                                                            <button type="button" onclick="closeDeclineModal()"
+                                                                class="px-4 py-2 text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors">
+                                                                Cancel
+                                                            </button>
+                                                            <button type="submit"
+                                                                class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors">
+                                                                Confirm Decline
+                                                            </button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                            <button onclick="openDeclineModal(<?php echo $appointment['id']; ?>)"
+                                                class="inline-flex items-center px-3 py-2 text-xs font-medium text-red-700 bg-red-100 hover:bg-red-200 border border-red-300 rounded-lg transition-all duration-200 hover:shadow-md">
+                                                <i class="fas fa-times mr-1"></i>
+                                                Decline
+                                            </button>
                                         <?php elseif ($appointment['status'] == 'confirmed'): ?>
                                             <form action="../php/admin/complete-appointment.php" method="POST" class="inline">
                                                 <input type="hidden" name="appointment_id"
@@ -220,4 +246,23 @@ $appointments = $status == 'all' ? archivedAppointments() : archivedAppointments
     </div>
 </div>
 
+
+<script>
+    function openDeclineModal(appointmentId) {
+        document.getElementById('declineAppointmentId').value = appointmentId;
+        document.getElementById('declineModal').classList.remove('hidden');
+    }
+
+    function closeDeclineModal() {
+        document.getElementById('declineModal').classList.add('hidden');
+        document.getElementById('decline_reason').value = '';
+    }
+
+    // Close modal when clicking outside
+    document.getElementById('declineModal').addEventListener('click', function (e) {
+        if (e.target.id === 'declineModal') {
+            closeDeclineModal();
+        }
+    });
+</script>
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>

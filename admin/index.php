@@ -9,8 +9,12 @@ $recentAppointments = getAllAppointments('confirmed');
 // Initialize $products properly
 $category_id = $_GET['category_id'] ?? null;
 $products = $category_id ? getProductsByCategory($category_id) : getAllProducts();
-?>
 
+// Get filter parameters
+$appointmentFilter = $_GET['appointment_filter'] ?? 'week';
+$salesFilter = $_GET['sales_filter'] ?? 'week';
+$inventoryFilter = $_GET['inventory_filter'] ?? 'all';
+?>
 
 <div class="min-h-screen bg-gray-50">
     <!-- Header Section -->
@@ -126,13 +130,26 @@ $products = $category_id ? getProductsByCategory($category_id) : getAllProducts(
         <!-- chart #1 -->
         <div class="w-full bg-white rounded-xl shadow-md border border-gray-100 p-4 md:p-6">
             <?php
-            // Query for completed appointments (no date filtering)
+            // Query for completed appointments with filter
+            $appointmentWhereClause = "WHERE a.status = 'completed'";
+
+            if ($appointmentFilter === 'week') {
+                $start_date = date('Y-m-d', strtotime('-6 days'));
+                $appointmentWhereClause = "WHERE a.status = 'completed' AND a.appointment_date >= '$start_date'";
+            } elseif ($appointmentFilter === 'month') {
+                $start_date = date('Y-m-d', strtotime('-30 days'));
+                $appointmentWhereClause = "WHERE a.status = 'completed' AND a.appointment_date >= '$start_date'";
+            } elseif ($appointmentFilter === 'year') {
+                $start_date = date('Y-m-d', strtotime('-365 days'));
+                $appointmentWhereClause = "WHERE a.status = 'completed' AND a.appointment_date >= '$start_date'";
+            }
+
             $stmt = $pdo->prepare("SELECT a.*, s.name as service_name, s.price as service_price, 
                           s.id as service_id, u.first_name, u.last_name, u.email, u.phone 
                    FROM appointments a 
                    JOIN services s ON a.service_id = s.id 
                    JOIN users u ON a.user_id = u.id 
-                   WHERE a.status = 'completed' 
+                   $appointmentWhereClause 
                    ORDER BY a.appointment_date DESC, a.appointment_time DESC");
             $stmt->execute();
             $appointments = $stmt->fetchAll();
@@ -191,32 +208,58 @@ $products = $category_id ? getProductsByCategory($category_id) : getAllProducts(
             // Sort by date
             ksort($daily_revenue);
 
-            // Prepare data for chart (last 7 days)
+            // Prepare data for chart based on filter
             $chart_dates = [];
             $chart_labels = [];
             $service_chart_data = []; // Will hold series data for each service
             
-            // Get last 7 days of data
-            $end_date_obj = new DateTime(); // Today
-            for ($i = 6; $i >= 0; $i--) {
-                $current_date = clone $end_date_obj;
-                $current_date->modify("-{$i} days");
-                $date_string = $current_date->format('Y-m-d');
-                $label = $current_date->format('d M');
+            if ($appointmentFilter === 'week') {
+                // Get last 7 days of data
+                $end_date_obj = new DateTime(); // Today
+                for ($i = 6; $i >= 0; $i--) {
+                    $current_date = clone $end_date_obj;
+                    $current_date->modify("-{$i} days");
+                    $date_string = $current_date->format('Y-m-d');
+                    $label = $current_date->format('d M');
 
-                $chart_dates[] = $date_string;
-                $chart_labels[] = $label;
+                    $chart_dates[] = $date_string;
+                    $chart_labels[] = $label;
+                }
+            } elseif ($appointmentFilter === 'month') {
+                // Get last 30 days grouped by week
+                $end_date_obj = new DateTime();
+                for ($i = 3; $i >= 0; $i--) {
+                    $current_date = clone $end_date_obj;
+                    $current_date->modify("-" . ($i * 7) . " days");
+                    $date_string = $current_date->format('Y-m-d');
+                    $label = 'Week ' . (4 - $i);
+
+                    $chart_dates[] = $date_string;
+                    $chart_labels[] = $label;
+                }
+            } else { // year
+                // Get last 12 months
+                $end_date_obj = new DateTime();
+                for ($i = 11; $i >= 0; $i--) {
+                    $current_date = clone $end_date_obj;
+                    $current_date->modify("-$i months");
+                    $date_string = $current_date->format('Y-m-01');
+                    $label = $current_date->format('M Y');
+
+                    $chart_dates[] = $date_string;
+                    $chart_labels[] = $label;
+                }
             }
 
             // Initialize service data structure
             foreach ($service_revenue as $service_id => $service) {
                 $service_chart_data[$service_id] = [
                     'name' => $service['name'],
-                    'data' => array_fill(0, 7, 0) // Initialize with 7 days of zeros
+                    'data' => array_fill(0, count($chart_dates), 0) // Initialize with zeros
                 ];
             }
 
-            // Populate service data for each day
+            // Populate service data for each period
             foreach ($chart_dates as $day_index => $date) {
                 if (isset($daily_revenue[$date])) {
                     foreach ($daily_revenue[$date]['services'] as $service_id => $service_data) {
@@ -227,55 +270,79 @@ $products = $category_id ? getProductsByCategory($category_id) : getAllProducts(
                 }
             }
 
-            // Calculate total for current week
-            $current_week_revenue = 0;
+            // Calculate total for current period
+            $current_period_revenue = 0;
             foreach ($chart_dates as $date) {
                 if (isset($daily_revenue[$date])) {
-                    $current_week_revenue += $daily_revenue[$date]['total'];
+                    $current_period_revenue += $daily_revenue[$date]['total'];
                 }
             }
 
-            // Calculate percentage change (comparing current week to previous week)
-            $previous_week_start = new DateTime();
-            $previous_week_start->modify('-13 days');
-            $previous_week_end = new DateTime();
-            $previous_week_end->modify('-7 days');
-
-            // Query for previous week data
-            $stmt_prev = $pdo->prepare("SELECT SUM(s.price) as prev_revenue
-                   FROM appointments a 
-                   JOIN services s ON a.service_id = s.id 
-                   WHERE a.status = 'completed' 
-                     AND a.appointment_date BETWEEN ? AND ?");
-            $stmt_prev->execute([$previous_week_start->format('Y-m-d'), $previous_week_end->format('Y-m-d')]);
-            $previous_week_data = $stmt_prev->fetch();
-            $previous_week_revenue = floatval($previous_week_data['prev_revenue'] ?? 0);
-
-            // Calculate percentage change
-            $percentage_change = 0;
-            if ($previous_week_revenue > 0) {
-                $percentage_change = (($current_week_revenue - $previous_week_revenue) / $previous_week_revenue) * 100;
-            }
-
+            // Calculate percentage change (comparing current period to previous period)
+            $previous_period_revenue = 0;
+            // This would need to be calculated based on the filter period
+            // For simplicity, we'll keep the existing week comparison
+            
             // Convert PHP arrays to JavaScript
             $js_chart_labels = json_encode($chart_labels);
             $js_service_chart_data = json_encode(array_values($service_chart_data));
             ?>
-            <div class="flex justify-between mb-5">
+            <div class="flex justify-between items-center mb-5">
                 <div>
                     <h5 class="leading-none text-3xl font-bold text-gray-900 dark:text-white pb-2">
-                        ₱<?php echo number_format($current_week_revenue, 2); ?>
+                        ₱<?php echo number_format($current_period_revenue, 2); ?>
                     </h5>
                     <p class="text-base font-normal text-gray-500 dark:text-gray-400">Total appointment revenue</p>
                 </div>
-                <div
-                    class="flex items-center px-2.5 py-0.5 text-base font-semibold <?php echo $percentage_change >= 0 ? 'text-green-500' : 'text-red-500'; ?> text-center">
-                    <?php echo abs(round($percentage_change, 1)); ?>%
-                    <svg class="w-3 h-3 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                        viewBox="0 0 10 14">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="<?php echo $percentage_change >= 0 ? 'M5 13V1m0 0L1 5m4-4 4 4' : 'M5 1v12m0 0l4-4m-4 4L1 9'; ?>" />
-                    </svg>
+                <div class="flex items-center space-x-2">
+                    <?php
+                    // Calculate percentage change for the current period
+                    $percentage_change = 0;
+                    if ($appointmentFilter === 'week') {
+                        // Calculate percentage change for week
+                        $previous_week_start = new DateTime();
+                        $previous_week_start->modify('-13 days');
+                        $previous_week_end = new DateTime();
+                        $previous_week_end->modify('-7 days');
+
+                        $stmt_prev = $pdo->prepare("SELECT SUM(s.price) as prev_revenue
+                               FROM appointments a 
+                               JOIN services s ON a.service_id = s.id 
+                               WHERE a.status = 'completed' 
+                                 AND a.appointment_date BETWEEN ? AND ?");
+                        $stmt_prev->execute([$previous_week_start->format('Y-m-d'), $previous_week_end->format('Y-m-d')]);
+                        $previous_week_data = $stmt_prev->fetch();
+                        $previous_period_revenue = floatval($previous_week_data['prev_revenue'] ?? 0);
+
+                        if ($previous_period_revenue > 0) {
+                            $percentage_change = (($current_period_revenue - $previous_period_revenue) / $previous_period_revenue) * 100;
+                        }
+                    }
+                    // Add similar logic for month and year filters if needed
+                    ?>
+                    <div
+                        class="flex items-center px-2.5 py-0.5 text-base font-semibold <?php echo $percentage_change >= 0 ? 'text-green-500' : 'text-red-500'; ?> text-center">
+                        <?php echo abs(round($percentage_change, 1)); ?>%
+                        <svg class="w-3 h-3 ms-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
+                            viewBox="0 0 10 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="<?php echo $percentage_change >= 0 ? 'M5 13V1m0 0L1 5m4-4 4 4' : 'M5 1v12m0 0l4-4m-4 4L1 9'; ?>" />
+                        </svg>
+                    </div>
+                    <div class="bg-white border border-gray-200 rounded-lg p-1">
+                        <a href="?appointment_filter=week&sales_filter=<?php echo $salesFilter; ?>&inventory_filter=<?php echo $inventoryFilter; ?>"
+                            class="px-3 py-1 text-sm rounded-md <?php echo $appointmentFilter === 'week' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'; ?>">
+                            Daily
+                        </a>
+                        <a href="?appointment_filter=month&sales_filter=<?php echo $salesFilter; ?>&inventory_filter=<?php echo $inventoryFilter; ?>"
+                            class="px-3 py-1 text-sm rounded-md <?php echo $appointmentFilter === 'month' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'; ?>">
+                            Weekly
+                        </a>
+                        <a href="?appointment_filter=year&sales_filter=<?php echo $salesFilter; ?>&inventory_filter=<?php echo $inventoryFilter; ?>"
+                            class="px-3 py-1 text-sm rounded-md <?php echo $appointmentFilter === 'year' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'; ?>">
+                            Monthly
+                        </a>
+                    </div>
                 </div>
             </div>
 
@@ -284,70 +351,20 @@ $products = $category_id ? getProductsByCategory($category_id) : getAllProducts(
 
             <div
                 class="grid grid-cols-1 items-center border-gray-200 border-t dark:border-gray-700 justify-between mt-5">
-                <!-- <div class="flex justify-between items-center pt-5"> -->
-                <!-- Button -->
-                <!-- <button id="dropdownDefaultButton" data-dropdown-toggle="lastDaysdropdown"
-                            data-dropdown-placement="bottom"
-                            class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 text-center inline-flex items-center dark:hover:text-white"
-                            type="button">
-                            Last 7 days
-                            <svg class="w-2.5 m-2.5 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                fill="none" viewBox="0 0 10 6">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="m1 1 4 4 4-4" />
-                            </svg>
-                        </button> -->
-                <!-- Dropdown menu -->
-                <!-- <div id="lastDaysdropdown"
-                            class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44 dark:bg-gray-700">
-                            <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
-                                aria-labelledby="dropdownDefaultButton">
-                                <li>
-                                    <a href="#"
-                                        class="hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-black">Yesterday</a>
-                                </li>
-                                <li>
-                                    <a href="#"
-                                        class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-black">Today</a>
-                                </li>
-                                <li>
-                                    <a href="#"
-                                        class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-black">Last
-                                        7 days</a>
-                                </li>
-                                <li>
-                                    <a href="#"
-                                        class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-black">Last
-                                        30 days</a>
-                                </li>
-                                <li>
-                                    <a href="#"
-                                        class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-blacke">Last
-                                        90 days</a>
-                                </li>
-                            </ul>
-                        </div>
-                        <a href="#"
-                            class="uppercase text-sm font-semibold inline-flex items-center rounded-lg text-blue-600 hover:text-blue-700 dark:hover:text-blue-500  hover:bg-gray-100 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700 px-3 py-2">
-                            Sales Report
-                            <svg class="w-2.5 h-2.5 ms-1.5 rtl:rotate-180" aria-hidden="true"
-                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="m1 9 4-4-4-4" />
-                            </svg>
-                        </a>
-                    </div> -->
             </div>
         </div>
 
         <!-- chart #2 -->
         <div class="w-full bg-white rounded-xl shadow-md border border-gray-100 p-4 md:p-6">
             <?php
-            // Query for confirmed orders (last 7 days)
-            $end_date = date('Y-m-d');
-            $start_date = date('Y-m-d', strtotime('-6 days'));
+            // Query for confirmed orders with filter
+            if ($salesFilter === 'week') {
+                $end_date = date('Y-m-d');
+                $start_date = date('Y-m-d', strtotime('-6 days'));
+                $group_by = "DATE(o.order_date), DAYNAME(o.order_date)";
+                $order_by = "DATE(o.order_date)";
 
-            $stmt = $pdo->prepare("SELECT 
+                $stmt = $pdo->prepare("SELECT 
                           DATE(o.order_date) as order_day,
                           DAYNAME(o.order_date) as day_name,
                           SUM(oi.price * oi.quantity) as daily_sales,
@@ -356,51 +373,172 @@ $products = $category_id ? getProductsByCategory($category_id) : getAllProducts(
                         JOIN order_items oi ON o.id = oi.order_id
                         WHERE o.status = 'confirmed' 
                           AND DATE(o.order_date) BETWEEN ? AND ?
-                        GROUP BY DATE(o.order_date), DAYNAME(o.order_date)
+                        GROUP BY $group_by
+                        ORDER BY $order_by");
+                $stmt->execute([$start_date, $end_date]);
+                $daily_sales_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                // Create data structure for week
+                $days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                $sales_by_period = array_fill_keys($days, 0);
+
+                foreach ($daily_sales_data as $day_data) {
+                    $day_abbr = substr($day_data['day_name'], 0, 3);
+                    $sales_by_period[$day_abbr] = floatval($day_data['daily_sales']);
+                }
+                $chart_labels = $days;
+
+            } elseif ($salesFilter === 'month') {
+                $end_date = date('Y-m-d');
+                $start_date = date('Y-m-d', strtotime('-29 days'));
+
+                $stmt = $pdo->prepare("SELECT 
+                          DATE(o.order_date) as order_day,
+                          SUM(oi.price * oi.quantity) as daily_sales
+                        FROM orders o 
+                        JOIN order_items oi ON o.id = oi.order_id
+                        WHERE o.status = 'confirmed' 
+                          AND DATE(o.order_date) BETWEEN ? AND ?
+                        GROUP BY DATE(o.order_date)
                         ORDER BY DATE(o.order_date)");
-            $stmt->execute([$start_date, $end_date]);
-            $daily_sales_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                $stmt->execute([$start_date, $end_date]);
+                $daily_sales_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            // Create a map of all days in the week
-            $days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-            $sales_by_day = array_fill_keys($days, 0);
+                // Group by week for monthly view
+                $sales_by_period = [];
+                $chart_labels = [];
 
-            // Calculate total sales and populate daily sales
-            $total_sales = 0;
-            $total_orders = 0;
+                $current_date = new DateTime($start_date);
+                $end_date_obj = new DateTime($end_date);
 
-            foreach ($daily_sales_data as $day_data) {
-                $day_abbr = substr($day_data['day_name'], 0, 3);
-                $sales_by_day[$day_abbr] = floatval($day_data['daily_sales']);
-                $total_sales += $day_data['daily_sales'];
-                $total_orders += $day_data['order_count'];
+                // Create weeks
+                $week_number = 1;
+                while ($current_date <= $end_date_obj) {
+                    $week_start = clone $current_date;
+                    $week_label = 'Week ' . $week_number;
+                    $sales_by_period[$week_label] = 0;
+                    $chart_labels[] = $week_label;
+
+                    // Skip 7 days
+                    $current_date->modify('+7 days');
+                    $week_number++;
+                }
+
+                // Assign data to weeks
+                foreach ($daily_sales_data as $day_data) {
+                    $order_date = new DateTime($day_data['order_day']);
+                    $days_diff = (int) $order_date->diff(new DateTime($start_date))->format('%a');
+                    $week_index = floor($days_diff / 7);
+
+                    if (isset($chart_labels[$week_index])) {
+                        $week_label = $chart_labels[$week_index];
+                        $sales_by_period[$week_label] += floatval($day_data['daily_sales']);
+                    }
+                }
+
+            } else { // year
+                $current_year = date('Y');
+                $start_date = $current_year . '-01-01';
+                $end_date = $current_year . '-12-31';
+
+                $stmt = $pdo->prepare("SELECT 
+                          MONTH(o.order_date) as order_month,
+                          YEAR(o.order_date) as order_year,
+                          SUM(oi.price * oi.quantity) as monthly_sales
+                        FROM orders o 
+                        JOIN order_items oi ON o.id = oi.order_id
+                        WHERE o.status = 'confirmed' 
+                          AND YEAR(o.order_date) = ?
+                        GROUP BY YEAR(o.order_date), MONTH(o.order_date)
+                        ORDER BY YEAR(o.order_date), MONTH(o.order_date)");
+                $stmt->execute([$current_year]);
+                $monthly_sales_data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                // Create data structure for year
+                $months = [
+                    'Jan',
+                    'Feb',
+                    'Mar',
+                    'Apr',
+                    'May',
+                    'Jun',
+                    'Jul',
+                    'Aug',
+                    'Sep',
+                    'Oct',
+                    'Nov',
+                    'Dec'
+                ];
+
+                $sales_by_period = array_fill_keys($months, 0);
+                $chart_labels = $months;
+
+                foreach ($monthly_sales_data as $month_data) {
+                    $month_num = intval($month_data['order_month']);
+                    if ($month_num >= 1 && $month_num <= 12) {
+                        $month_name = $months[$month_num - 1];
+                        $sales_by_period[$month_name] = floatval($month_data['monthly_sales']);
+                    }
+                }
             }
 
-            // Calculate percentage change from previous week
-            $prev_start_date = date('Y-m-d', strtotime('-13 days'));
-            $prev_end_date = date('Y-m-d', strtotime('-7 days'));
+            $total_sales = array_sum($sales_by_period);
+            $chart_data = [];
 
-            $stmt_prev = $pdo->prepare("SELECT SUM(oi.price * oi.quantity) as prev_sales
+            foreach ($chart_labels as $label) {
+                $chart_data[] = ['x' => $label, 'y' => $sales_by_period[$label]];
+            }
+
+            // Calculate percentage change from previous period
+            $percentage_change = 0;
+            if ($salesFilter === 'week') {
+                $prev_start_date = date('Y-m-d', strtotime('-13 days'));
+                $prev_end_date = date('Y-m-d', strtotime('-7 days'));
+
+                $stmt_prev = $pdo->prepare("SELECT SUM(oi.price * oi.quantity) as prev_sales
                               FROM orders o 
                               JOIN order_items oi ON o.id = oi.order_id
                               WHERE o.status = 'confirmed' 
                                 AND DATE(o.order_date) BETWEEN ? AND ?");
-            $stmt_prev->execute([$prev_start_date, $prev_end_date]);
-            $prev_week_sales = $stmt_prev->fetchColumn();
+                $stmt_prev->execute([$prev_start_date, $prev_end_date]);
+                $prev_period_sales = $stmt_prev->fetchColumn();
 
-            $percentage_change = 0;
-            if ($prev_week_sales > 0) {
-                $percentage_change = (($total_sales - $prev_week_sales) / $prev_week_sales) * 100;
-            }
+                if ($prev_period_sales > 0) {
+                    $percentage_change = (($total_sales - $prev_period_sales) / $prev_period_sales) * 100;
+                }
+            } elseif ($salesFilter === 'month') {
+                $prev_start_date = date('Y-m-d', strtotime('-59 days'));
+                $prev_end_date = date('Y-m-d', strtotime('-30 days'));
 
-            // Prepare data for chart
-            $chart_data = [];
-            foreach ($days as $day) {
-                $chart_data[] = ['x' => $day, 'y' => $sales_by_day[$day]];
+                $stmt_prev = $pdo->prepare("SELECT SUM(oi.price * oi.quantity) as prev_sales
+                              FROM orders o 
+                              JOIN order_items oi ON o.id = oi.order_id
+                              WHERE o.status = 'confirmed' 
+                                AND DATE(o.order_date) BETWEEN ? AND ?");
+                $stmt_prev->execute([$prev_start_date, $prev_end_date]);
+                $prev_period_sales = $stmt_prev->fetchColumn();
+
+                if ($prev_period_sales > 0) {
+                    $percentage_change = (($total_sales - $prev_period_sales) / $prev_period_sales) * 100;
+                }
+            } else { // year
+                $prev_year = date('Y') - 1;
+
+                $stmt_prev = $pdo->prepare("SELECT SUM(oi.price * oi.quantity) as prev_sales
+                              FROM orders o 
+                              JOIN order_items oi ON o.id = oi.order_id
+                              WHERE o.status = 'confirmed' 
+                                AND YEAR(o.order_date) = ?");
+                $stmt_prev->execute([$prev_year]);
+                $prev_period_sales = $stmt_prev->fetchColumn();
+
+                if ($prev_period_sales > 0) {
+                    $percentage_change = (($total_sales - $prev_period_sales) / $prev_period_sales) * 100;
+                }
             }
             ?>
 
-            <div class="flex justify-between pb-4 mb-4 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex justify-between items-center pb-4 mb-4 border-b border-gray-200 dark:border-gray-700">
                 <div class="flex items-center">
                     <div
                         class="w-12 h-12 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center me-3">
@@ -415,11 +553,30 @@ $products = $category_id ? getProductsByCategory($category_id) : getAllProducts(
                     <div>
                         <h5 class="leading-none text-2xl font-bold text-gray-900 dark:text-white pb-1">
                             ₱<?php echo number_format($total_sales, 2); ?></h5>
-                        <p class="text-sm font-normal text-gray-500 dark:text-gray-400">Total product sales this week
-                        </p>
+                        <p class="text-sm font-normal text-gray-500 dark:text-gray-400">Total product sales</p>
                     </div>
                 </div>
-                <div>
+                <div class="flex items-center space-x-2">
+                    <?php
+                    // Calculate percentage change for product sales
+                    $percentage_change = 0;
+                    if ($salesFilter === 'week') {
+                        $prev_start_date = date('Y-m-d', strtotime('-13 days'));
+                        $prev_end_date = date('Y-m-d', strtotime('-7 days'));
+
+                        $stmt_prev = $pdo->prepare("SELECT SUM(oi.price * oi.quantity) as prev_sales
+                              FROM orders o 
+                              JOIN order_items oi ON o.id = oi.order_id
+                              WHERE o.status = 'confirmed' 
+                                AND DATE(o.order_date) BETWEEN ? AND ?");
+                        $stmt_prev->execute([$prev_start_date, $prev_end_date]);
+                        $prev_period_sales = $stmt_prev->fetchColumn();
+
+                        if ($prev_period_sales > 0) {
+                            $percentage_change = (($total_sales - $prev_period_sales) / $prev_period_sales) * 100;
+                        }
+                    }
+                    ?>
                     <span
                         class="bg-<?php echo $percentage_change >= 0 ? 'green' : 'red'; ?>-100 text-<?php echo $percentage_change >= 0 ? 'green' : 'red'; ?>-800 text-xs font-medium inline-flex items-center px-2.5 py-1 rounded-md dark:bg-<?php echo $percentage_change >= 0 ? 'green' : 'red'; ?>-900 dark:text-<?php echo $percentage_change >= 0 ? 'green' : 'red'; ?>-300">
                         <svg class="w-2.5 h-2.5 me-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
@@ -429,63 +586,24 @@ $products = $category_id ? getProductsByCategory($category_id) : getAllProducts(
                         </svg>
                         <?php echo abs(round($percentage_change, 1)); ?>%
                     </span>
+                    <div class="bg-white border border-gray-200 rounded-lg p-1">
+                        <a href="?appointment_filter=<?php echo $appointmentFilter; ?>&sales_filter=week&inventory_filter=<?php echo $inventoryFilter; ?>"
+                            class="px-3 py-1 text-sm rounded-md <?php echo $salesFilter === 'week' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'; ?>">
+                            Daily
+                        </a>
+                        <a href="?appointment_filter=<?php echo $appointmentFilter; ?>&sales_filter=month&inventory_filter=<?php echo $inventoryFilter; ?>"
+                            class="px-3 py-1 text-sm rounded-md <?php echo $salesFilter === 'month' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'; ?>">
+                            Weekly
+                        </a>
+                        <a href="?appointment_filter=<?php echo $appointmentFilter; ?>&sales_filter=year&inventory_filter=<?php echo $inventoryFilter; ?>"
+                            class="px-3 py-1 text-sm rounded-md <?php echo $salesFilter === 'year' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'; ?>">
+                            Monthly
+                        </a>
+                    </div>
                 </div>
             </div>
             <div id="column-chart"></div>
             <div class="grid grid-cols-1 items-center border-gray-200 border-t dark:border-gray-700 justify-between">
-                <!-- <div class="flex justify-between items-center pt-5"> -->
-                <!-- Button -->
-                <!-- <button id="dropdownDefaultButton" data-dropdown-toggle="lastDaysdropdown"
-                            data-dropdown-placement="bottom"
-                            class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 text-center inline-flex items-center dark:hover:text-white"
-                            type="button">
-                            Last 7 days
-                            <svg class="w-2.5 m-2.5 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                fill="none" viewBox="0 0 10 6">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="m1 1 4 4 4-4" />
-                            </svg>
-                        </button> -->
-                <!-- Dropdown menu -->
-                <!-- <div id="lastDaysdropdown"
-                            class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-44 dark:bg-gray-700">
-                            <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
-                                aria-labelledby="dropdownDefaultButton">
-                                <li>
-                                    <a href="#"
-                                        class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Yesterday</a>
-                                </li>
-                                <li>
-                                    <a href="#"
-                                        class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Today</a>
-                                </li>
-                                <li>
-                                    <a href="#"
-                                        class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Last
-                                        7 days</a>
-                                </li>
-                                <li>
-                                    <a href="#"
-                                        class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Last
-                                        30 days</a>
-                                </li>
-                                <li>
-                                    <a href="#"
-                                        class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Last
-                                        90 days</a>
-                                </li>
-                            </ul>
-                        </div> -->
-                <!-- <a href="#"
-                            class="uppercase text-sm font-semibold inline-flex items-center rounded-lg text-blue-600 hover:text-blue-700 dark:hover:text-blue-500  hover:bg-gray-100 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700 px-3 py-2">
-                            Sales Report
-                            <svg class="w-2.5 h-2.5 ms-1.5 rtl:rotate-180" aria-hidden="true"
-                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="m1 9 4-4-4-4" />
-                            </svg>
-                        </a> -->
-                <!-- </div> -->
             </div>
         </div>
     </div>
@@ -494,24 +612,45 @@ $products = $category_id ? getProductsByCategory($category_id) : getAllProducts(
     <div class="container mx-auto px-6 gap-6 mb-8">
         <div class="w-full bg-white rounded-xl shadow-md border border-gray-100 p-4 md:p-6">
             <div>
-                <div class="flex justify-between pb-4 mb-4 border-b border-gray-200">
+                <div class="flex justify-between items-center pb-4 mb-4 border-b border-gray-200">
                     <div class="flex items-center">
                         <div class="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center me-3">
                             <i class="fas fa-boxes text-gray-500 text-xl"></i>
                         </div>
                         <div>
                             <h5 class="leading-none text-2xl font-bold text-gray-900 pb-1">
-                                <?php echo array_sum(array_column($products, 'stock')); ?>
+                                <?php
+                                if ($inventoryFilter === 'low') {
+                                    $lowStockProducts = array_filter($products, function ($product) {
+                                        return $product['stock'] <= 10; // Adjust threshold as needed
+                                    });
+                                    echo array_sum(array_column($lowStockProducts, 'stock'));
+                                } else {
+                                    echo array_sum(array_column($products, 'stock'));
+                                }
+                                ?>
                             </h5>
-                            <p class="text-sm font-normal text-gray-500">Total Products in Stock</p>
+                            <p class="text-sm font-normal text-gray-500">
+                                <?php echo $inventoryFilter === 'low' ? 'Low Stock Products' : 'Total Products in Stock'; ?>
+                            </p>
                         </div>
                     </div>
-                    <div>
+                    <div class="flex items-center space-x-2">
                         <span
                             class="bg-blue-100 text-blue-800 text-xs font-medium inline-flex items-center px-2.5 py-1 rounded-md">
                             <i class="fas fa-chart-line mr-1"></i>
                             Stock Overview
                         </span>
+                        <div class="bg-white border border-gray-200 rounded-lg p-1">
+                            <a href="?appointment_filter=<?php echo $appointmentFilter; ?>&sales_filter=<?php echo $salesFilter; ?>&inventory_filter=all"
+                                class="px-3 py-1 text-sm rounded-md <?php echo $inventoryFilter === 'all' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'; ?>">
+                                All Stock
+                            </a>
+                            <a href="?appointment_filter=<?php echo $appointmentFilter; ?>&sales_filter=<?php echo $salesFilter; ?>&inventory_filter=low"
+                                class="px-3 py-1 text-sm rounded-md <?php echo $inventoryFilter === 'low' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'; ?>">
+                                Low Stock
+                            </a>
+                        </div>
                     </div>
                 </div>
                 <div id="inventory-chart"></div>
@@ -523,7 +662,8 @@ $products = $category_id ? getProductsByCategory($category_id) : getAllProducts(
                         categories: <?php echo json_encode(array_map(function ($p) {
                             return getProductCategoryById($p['category_id'])['name'];
                         }, $products)); ?>,
-                        totalStock: <?php echo array_sum(array_column($products, 'stock')); ?>
+                        totalStock: <?php echo array_sum(array_column($products, 'stock')); ?>,
+                        inventoryFilter: '<?php echo $inventoryFilter; ?>'
                     };
                 </script>
             </div>
@@ -531,12 +671,13 @@ $products = $category_id ? getProductsByCategory($category_id) : getAllProducts(
     </div>
 </div>
 
-
-
 <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.46.0/dist/apexcharts.min.js"></script>
 <?php
 echo '<script>
     var dashboardConfig = {
+        appointmentFilter: "' . $appointmentFilter . '",
+        salesFilter: "' . $salesFilter . '",
+        inventoryFilter: "' . $inventoryFilter . '",
         chartLabels: ' . $js_chart_labels . ',
         serviceChartData: ' . $js_service_chart_data . ',
         columnChartData: ' . json_encode($chart_data) . '
@@ -545,6 +686,5 @@ echo '<script>
 ?>
 
 <script src="../assets/js/charts.js"></script>
-
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
