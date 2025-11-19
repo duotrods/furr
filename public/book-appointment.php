@@ -157,8 +157,6 @@ if ($allServices) {
                                             <option value="">Select Pet Type</option>
                                             <option value="Dog">🐕 Dog</option>
                                             <option value="Cat">🐱 Cat</option>
-                                            <option value="Rabbit">🐰 Rabbit</option>
-                                            <option value="Other">🐾 Other</option>
                                         </select>
                                     </div>
 

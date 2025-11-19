@@ -23,7 +23,7 @@ try {
         'start' => '09:00:00', // 9 AM
         'end' => '17:00:00'    // 5 PM
     ];
-    $slot_interval = 30; // minutes
+    $slot_interval = 60; // minutes
 
     // 3. Get existing appointments for the date
     $stmt = $pdo->prepare("
@@ -59,7 +59,8 @@ try {
 /**
  * Generates time slots between start and end times
  */
-function generateTimeSlots($start, $end, $interval) {
+function generateTimeSlots($start, $end, $interval)
+{
     $slots = [];
     $current = strtotime($start);
     $end = strtotime($end);
@@ -75,24 +76,25 @@ function generateTimeSlots($start, $end, $interval) {
 /**
  * Filters time slots to ensure service duration can be accommodated
  */
-function filterSlotsByDuration($slots, $duration, $interval) {
+function filterSlotsByDuration($slots, $duration, $interval)
+{
     $valid_slots = [];
     $consecutive_slots_needed = ceil($duration / $interval);
-    
+
     foreach ($slots as $index => $slot) {
         $has_consecutive = true;
-        
+
         for ($i = 1; $i < $consecutive_slots_needed; $i++) {
             if (!isset($slots[$index + $i])) {
                 $has_consecutive = false;
                 break;
             }
         }
-        
+
         if ($has_consecutive) {
             $valid_slots[] = $slot;
         }
     }
-    
+
     return $valid_slots;
 }
