@@ -18,7 +18,7 @@ if ($allServices) {
         }
     }
 }
-
+$user = getUser();
 ?>
 
 <?php require_once '../includes/header.php'; ?>
@@ -194,7 +194,7 @@ if ($allServices) {
                                             </label>
                                             <input type="tel" id="contact_number" name="contact_number" required
                                                 class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-slate-50 focus:bg-white"
-                                                placeholder="09123456789">
+                                                value="<?php echo $user['contact_number']; ?>">
                                         </div>
                                     </div>
 
@@ -204,7 +204,7 @@ if ($allServices) {
                                         </label>
                                         <input type="email" id="email" name="email" required
                                             class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-slate-50 focus:bg-white"
-                                            value="<?php echo isset($_SESSION['user_email']) ? $_SESSION['user_email'] : ''; ?>">
+                                            value="<?php echo $user['email']; ?>">
                                     </div>
                                 </div>
 

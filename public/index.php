@@ -195,72 +195,8 @@
         </div>
     </div>
 
-    <!-- Testimonials Section -->
-    <div class="container mx-auto px-4 pb-16">
-        <div class="text-center mb-12">
-            <h2 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">What Pet Parents Say</h2>
-            <p class="text-xl text-gray-600">Don't just take our word for it</p>
-        </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-                <div class="flex text-yellow-400 mb-4">
-                    <span>★★★★★</span>
-                </div>
-                <p class="text-gray-600 mb-4 italic">
-                    "FurCare transformed my anxious rescue dog into a happy, well-groomed pup. The staff is amazing!"
-                </p>
-                <div class="flex items-center">
-                    <div
-                        class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold mr-3">
-                        S
-                    </div>
-                    <div>
-                        <div class="font-semibold">Sarah M.</div>
-                        <div class="text-sm text-gray-500">Dog Parent</div>
-                    </div>
-                </div>
-            </div>
 
-            <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-                <div class="flex text-yellow-400 mb-4">
-                    <span>★★★★★</span>
-                </div>
-                <p class="text-gray-600 mb-4 italic">
-                    "Professional service and my cat actually enjoys going there now. Highly recommended!"
-                </p>
-                <div class="flex items-center">
-                    <div
-                        class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold mr-3">
-                        M
-                    </div>
-                    <div>
-                        <div class="font-semibold">Mike R.</div>
-                        <div class="text-sm text-gray-500">Cat Parent</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-                <div class="flex text-yellow-400 mb-4">
-                    <span>★★★★★</span>
-                </div>
-                <p class="text-gray-600 mb-4 italic">
-                    "The best grooming service in town. My pets always come home looking and feeling great!"
-                </p>
-                <div class="flex items-center">
-                    <div
-                        class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white font-bold mr-3">
-                        L
-                    </div>
-                    <div>
-                        <div class="font-semibold">Lisa T.</div>
-                        <div class="text-sm text-gray-500">Multi-Pet Parent</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 
 <?php require_once '../includes/footer.php'; ?>

@@ -87,7 +87,8 @@ if (isLoggedIn()) {
                             Email Address <span class="text-red-500">*</span>
                         </label>
                         <div class="relative">
-                            <input type="email" id="email" name="email" pattern="[A-Za-z\s]+" required
+                            <input type="email" id="email" name="email"
+                                pattern="^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$" required
                                 placeholder="Enter your email address"
                                 class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white">
                             <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
