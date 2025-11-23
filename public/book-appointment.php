@@ -194,7 +194,7 @@ $user = getUser();
                                             </label>
                                             <input type="tel" id="contact_number" name="contact_number" required
                                                 class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-slate-50 focus:bg-white"
-                                                value="<?php echo $user['contact_number']; ?>">
+                                                value="<?php echo $user['phone']; ?>">
                                         </div>
                                     </div>
 
