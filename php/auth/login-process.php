@@ -26,7 +26,7 @@ if (empty($email) || empty($password)) {
 }
 
 // Check if user exists
-$stmt = $pdo->prepare("SELECT * FROM users WHERE email = ? AND is_verified = 1");
+$stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
 $stmt->execute([$email]);
 $user = $stmt->fetch();
 
@@ -39,6 +39,13 @@ if (!$user || !password_verify($password, $user['password'])) {
 // Check if account is verified
 if (!$user['is_verified']) {
     $_SESSION['error_message'] = 'Please verify your email address before logging in.';
+    header('Location: ' . BASE_URL . '/public/login.php');
+    exit();
+}
+
+// Check if account is approved by admin
+if (!$user['is_approved']) {
+    $_SESSION['error_message'] = 'Your account is pending admin approval. You will receive an email once your account is approved.';
     header('Location: ' . BASE_URL . '/public/login.php');
     exit();
 }

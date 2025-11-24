@@ -85,6 +85,23 @@ $current_page = basename($_SERVER['PHP_SELF']);
                             class="text-sm font-medium <?= ($current_page == 'reports.php') ? 'text-blue-600 border-b-2 border-blue-600 pb-4' : 'text-gray-700' ?> hover:text-blue-600 transition duration-300 py-4">
                             Reports
                         </a>
+                        <a href="../admin/manage-registrations.php"
+                            class="text-sm font-medium <?= ($current_page == 'manage-registrations.php') ? 'text-blue-600 border-b-2 border-blue-600 pb-4' : 'text-gray-700' ?> hover:text-blue-600 transition duration-300 py-4 relative">
+                            Users
+                            <?php
+                            // Get pending registrations count
+                            $stmt = $pdo->prepare("SELECT COUNT(*) as pending_count FROM users WHERE is_approved = 0");
+                            $stmt->execute();
+                            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                            $pending_reg_count = $result['pending_count'] ?? 0;
+
+                            if ($pending_reg_count > 0): ?>
+                                <span
+                                    class="absolute -top-1 -right-2 bg-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium transform translate-x-1/2 -translate-y-1/4">
+                                    <?= $pending_reg_count ?>
+                                </span>
+                            <?php endif; ?>
+                        </a>
                     </div>
                     <div class="relative group">
                         <button class="flex items-center space-x-2 focus:outline-none">
@@ -200,8 +217,17 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <div id="mobile-menu" class="hidden md:hidden pb-4">
             <?php if (isLoggedIn() && isAdmin()): ?>
                 <a href="../admin/index.php"
-                    class="block py-2 px-4 text-gray-800 hover:bg-blue-100 <?php echo $current_page == 'index.php' && strpos($_SERVER['REQUEST_URI'], 'admin') !== false ? 'bg-blue-100' : ''; ?>">Admin
-                    Panel</a>
+                    class="block py-2 px-4 text-gray-800 hover:bg-blue-100 <?php echo $current_page == 'index.php' && strpos($_SERVER['REQUEST_URI'], 'admin') !== false ? 'bg-blue-100' : ''; ?>">Home</a>
+                <a href="../admin/appointments.php"
+                    class="block py-2 px-4 text-gray-800 hover:bg-blue-100 <?php echo $current_page == 'appointments.php' ? 'bg-blue-100' : ''; ?>">Appointments</a>
+                <a href="../admin/payment-review.php"
+                    class="block py-2 px-4 text-gray-800 hover:bg-blue-100 <?php echo $current_page == 'payment-review.php' ? 'bg-blue-100' : ''; ?>">Payments</a>
+                <a href="../admin/products.php"
+                    class="block py-2 px-4 text-gray-800 hover:bg-blue-100 <?php echo $current_page == 'products.php' ? 'bg-blue-100' : ''; ?>">Products</a>
+                <a href="../admin/reports.php"
+                    class="block py-2 px-4 text-gray-800 hover:bg-blue-100 <?php echo $current_page == 'reports.php' ? 'bg-blue-100' : ''; ?>">Reports</a>
+                <a href="../admin/manage-registrations.php"
+                    class="block py-2 px-4 text-gray-800 hover:bg-blue-100 <?php echo $current_page == 'manage-registrations.php' ? 'bg-blue-100' : ''; ?>">User Registrations</a>
                 <a href="../public/profile.php"
                     class="block py-2 px-4 text-gray-800 hover:bg-blue-100 <?php echo $current_page == 'profile.php' ? 'bg-blue-100' : ''; ?>">Profile</a>
                 <a href="../php/auth/logout.php" class="block py-2 px-4 text-gray-800 hover:bg-blue-100">Logout</a>

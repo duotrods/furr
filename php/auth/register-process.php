@@ -66,8 +66,8 @@ $verification_code = bin2hex(random_bytes(16));
 
 // Insert user into database
 try {
-    $stmt = $pdo->prepare("INSERT INTO users (first_name, last_name, email, phone, address, password, verification_code, is_verified) 
-                      VALUES (?, ?, ?, ?, ?, ?, ?, 0)");
+    $stmt = $pdo->prepare("INSERT INTO users (first_name, last_name, email, phone, address, password, verification_code, is_verified, is_approved)
+                      VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0)");
     $stmt->execute([$first_name, $last_name, $email, $phone, $address, $password_hash, $verification_code]);
     
     // Send verification email
@@ -81,7 +81,7 @@ try {
             The FurCare Team";
     
     if (sendEmail($email, $subject, $body)) {
-        $_SESSION['success_message'] = 'Registration successful! Please check your email to verify your account.';
+        $_SESSION['success_message'] = 'Registration successful! Please check your email to verify your account. After email verification, an admin will review your registration before you can log in.';
     } else {
         $_SESSION['error_message'] = 'Registration successful, but we couldn\'t send the verification email. Please contact support.';
     }
