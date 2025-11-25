@@ -68,9 +68,7 @@ foreach ($cartItems as $product_id => $quantity) {
 }
 
 // Calculate total
-$subtotal = calculateCartTotal();
-$shipping_fee = 50.00; // Fixed shipping fee
-$total = $subtotal + $shipping_fee;
+$total = calculateCartTotal();
 
 // Create order
 try {

@@ -3,7 +3,7 @@ require_once(__DIR__ . '/../includes/config.php');
 requireAdmin();
 
 if (!isset($_GET['id'])) {
-    header('Location: payment-review.php');
+    header('Location: orders.php');
     exit();
 }
 
@@ -21,7 +21,7 @@ $order = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$order) {
     $_SESSION['error_message'] = 'Order not found.';
-    header('Location: payment-review.php');
+    header('Location: orders.php');
     exit();
 }
 
@@ -49,12 +49,17 @@ $order_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </h1>
                     <p class="text-gray-600">Order management and payment verification</p>
                 </div>
-                <a href="payment-review.php" 
+                <?php
+                $back_page = $_GET['from'] ?? 'orders';
+                $back_url = $back_page == 'payment-review' ? 'payment-review.php' : 'orders.php';
+                $back_text = $back_page == 'payment-review' ? 'Back to Payment Review' : 'Back to Orders';
+                ?>
+                <a href="<?= $back_url ?>"
                    class="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200 font-medium">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                     </svg>
-                    Back to Payment Review
+                    <?= $back_text ?>
                 </a>
             </div>
         </div>

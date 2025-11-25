@@ -9,8 +9,96 @@ $end_date = $_GET['end_date'] ?? date('Y-m-t');
 $category = $_GET['category'] ?? 'all';
 ?>
 
+<style>
+    @media print {
+
+        /* Hide navigation, buttons, and filters when printing */
+        nav,
+        button,
+        .no-print,
+        form {
+            display: none !important;
+        }
+
+        /* Hide filter tabs and actions */
+        .bg-gradient-to-r.from-blue-600 {
+            display: none !important;
+        }
+
+        /* Optimize page layout for printing */
+        body {
+            background: white !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        .min-h-screen {
+            background: white !important;
+        }
+
+        /* Remove shadows and borders for cleaner print */
+        .shadow-lg,
+        .shadow-sm {
+            box-shadow: none !important;
+        }
+
+        /* Ensure tables fit on page */
+        table {
+            page-break-inside: auto;
+        }
+
+        tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
+        }
+
+        thead {
+            display: table-header-group;
+        }
+
+        tfoot {
+            display: table-footer-group;
+        }
+
+        /* Add print header */
+        @page {
+            margin: 1cm;
+        }
+
+        .container {
+            max-width: 100% !important;
+            padding: 0 !important;
+        }
+
+        /* Show print date */
+        .print-header {
+            display: block !important;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #333;
+        }
+    }
+
+    /* Hide print header on screen */
+    .print-header {
+        display: none;
+    }
+</style>
+
 <div class="min-h-screen bg-gray-50">
     <div class="container mx-auto px-4 py-8">
+        <!-- Print-only Header -->
+        <div class="print-header">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">FurCare Pet Grooming - Business Report</h1>
+            <div class="text-sm text-gray-600">
+                <p><strong>Report Type:</strong> <?php echo ucfirst($report_type); ?> Report</p>
+                <p><strong>Period:</strong> <?php echo date('F j, Y', strtotime($start_date)); ?> to
+                    <?php echo date('F j, Y', strtotime($end_date)); ?>
+                </p>
+                <p><strong>Generated:</strong> <?php echo date('F j, Y g:i A'); ?></p>
+            </div>
+        </div>
+
         <!-- Header Section -->
         <div class="mb-8">
             <h1 class="text-4xl font-bold text-gray-900 mb-2">Business Reports</h1>
@@ -48,9 +136,18 @@ $category = $_GET['category'] ?? 'all';
                                     Filter
                                 </button>
                             </div>
-                            <div class="flex items-end">
+                            <div class="flex items-end gap-2">
+                                <button onclick="window.print()"
+                                    class="bg-yellow-400 hover:bg-yellow-600 text-white font-semibold py-3 px-6 rounded-lg transition duration-300 shadow-sm flex items-center justify-center">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z">
+                                        </path>
+                                    </svg>
+                                    Print
+                                </button>
                                 <a href="../php/admin/export_pdf.php?type=<?php echo $report_type; ?>&start_date=<?php echo $start_date; ?>&end_date=<?php echo $end_date; ?>"
-                                    class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg transition duration-300 shadow-sm flex items-center justify-center">
+                                    class="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg transition duration-300 shadow-sm flex items-center justify-center">
                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
@@ -103,6 +200,17 @@ $category = $_GET['category'] ?? 'all';
                                         </path>
                                     </svg>
                                     Filter
+                                </button>
+                            </div>
+                            <div class="flex-shrink-0">
+                                <button onclick="window.print()"
+                                    class="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg transition duration-300 shadow-sm flex items-center justify-center">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z">
+                                        </path>
+                                    </svg>
+                                    Print
                                 </button>
                             </div>
                             <div class="flex-shrink-0">
@@ -261,7 +369,8 @@ ORDER BY a.appointment_date DESC, a.appointment_time DESC");
                         <?php if ($category != 'all'): ?>
 
                             <p class="text-gray-600">Category:
-                                <?php echo htmlspecialchars($categoryLabels[$category] ?? 'Unknown'); ?></p>
+                                <?php echo htmlspecialchars($categoryLabels[$category] ?? 'Unknown'); ?>
+                            </p>
                         <?php endif; ?>
                     </div>
 

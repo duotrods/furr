@@ -62,8 +62,8 @@ $current_page = basename($_SERVER['PHP_SELF']);
                             <?php
                             // Get pending payment count
                             $stmt = $pdo->prepare("
-        SELECT COUNT(*) as pending_count 
-        FROM orders 
+        SELECT COUNT(*) as pending_count
+        FROM orders
         WHERE status = 'payment_review'
     ");
                             $stmt->execute();
@@ -76,6 +76,10 @@ $current_page = basename($_SERVER['PHP_SELF']);
                                     <?= $pending_count ?>
                                 </span>
                             <?php endif; ?>
+                        </a>
+                        <a href="../admin/orders.php"
+                            class="text-sm font-medium <?= ($current_page == 'orders.php') ? 'text-blue-600 border-b-2 border-blue-600 pb-4' : 'text-gray-700' ?> hover:text-blue-600 transition duration-300 py-4">
+                            Orders
                         </a>
                         <a href="../admin/products.php"
                             class="text-sm font-medium <?= ($current_page == 'products.php') ? 'text-blue-600 border-b-2 border-blue-600 pb-4' : 'text-gray-700' ?> hover:text-blue-600 transition duration-300 py-4">
@@ -222,6 +226,8 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     class="block py-2 px-4 text-gray-800 hover:bg-blue-100 <?php echo $current_page == 'appointments.php' ? 'bg-blue-100' : ''; ?>">Appointments</a>
                 <a href="../admin/payment-review.php"
                     class="block py-2 px-4 text-gray-800 hover:bg-blue-100 <?php echo $current_page == 'payment-review.php' ? 'bg-blue-100' : ''; ?>">Payments</a>
+                <a href="../admin/orders.php"
+                    class="block py-2 px-4 text-gray-800 hover:bg-blue-100 <?php echo $current_page == 'orders.php' ? 'bg-blue-100' : ''; ?>">Orders</a>
                 <a href="../admin/products.php"
                     class="block py-2 px-4 text-gray-800 hover:bg-blue-100 <?php echo $current_page == 'products.php' ? 'bg-blue-100' : ''; ?>">Products</a>
                 <a href="../admin/reports.php"
