@@ -7,6 +7,9 @@ if (session_status() === PHP_SESSION_NONE) {
     ]);
 }
 
+// Include config for BASE_URL
+require_once __DIR__ . '/../../includes/config.php';
+
 // Clear all session data
 $_SESSION = [];
 
@@ -35,5 +38,5 @@ if (isset($_COOKIE['remember_token'])) {
 
 // Redirect to login page with success message
 $_SESSION['success_message'] = 'You have been logged out successfully.';
-header('Location: /furr/public/login.php');
+header('Location: ' . BASE_URL . '/public/login.php');
 exit();
