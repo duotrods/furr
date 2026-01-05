@@ -64,9 +64,10 @@
                     <div class="group bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full">
                         <!-- Product Image -->
                         <div class="relative overflow-hidden">
-                            <img src="../assets/uploads/<?php echo $product['image'] ?: 'default-product.jpg'; ?>"
+                            <img src="../assets/uploads/<?php echo $product['image'] ?: 'default-product.svg'; ?>"
                                 alt="<?php echo $product['name']; ?>"
-                                class="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-300">
+                                class="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-300"
+                                onerror="this.onerror=null; this.src='../assets/uploads/default-product.svg';">
 
                             <!-- Stock Badge -->
                             <?php if ($product['stock'] <= 0): ?>
@@ -75,6 +76,13 @@
                                         <path fill-rule="evenodd" d="M13.477 14.89A6 6 0 015.11 6.524l8.367 8.368zm1.414-1.414L6.524 5.11a6 6 0 018.367 8.367zM18 10a8 8 0 11-16 0 8 8 0 0116 0z" clip-rule="evenodd"></path>
                                     </svg>
                                     Out of Stock
+                                </div>
+                            <?php elseif ($product['stock'] > 0 && $product['stock'] < 10): ?>
+                                <div class="absolute top-4 right-4 bg-yellow-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                                    <svg class="w-3 h-3 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    Low Stock
                                 </div>
                             <?php else: ?>
                                 <div class="absolute top-4 right-4 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">

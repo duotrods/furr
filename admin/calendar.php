@@ -81,7 +81,7 @@
   <div class="bg-white rounded-2xl shadow-2xl p-0 max-w-md w-full">
     <div class="bg-gradient-to-r from-slate-700 to-slate-800 px-8 py-6 rounded-t-2xl">
       <div class="flex justify-between items-center">
-        <h3 class="text-2xl font-bold text-white">Add Store Closure</h3>
+        <h3 class="text-2xl font-bold text-white">Add Closing Time</h3>
         <button onclick="document.getElementById('addClosureModal').classList.add('hidden')"
           class="text-slate-300 hover:text-white transition-colors duration-200 p-1">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -179,8 +179,8 @@
             Cancel
           </button>
           <button type="submit"
-            class="px-6 py-2.5 bg-gradient-to-r from-red-600 to-red-700 text-white font-semibold rounded-lg hover:from-red-700 hover:to-red-800 transition-all duration-200 shadow-sm hover:shadow-md">
-            Add Closure
+            class="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-sm hover:shadow-md">
+            Add Closing Time
           </button>
         </div>
       </form>
@@ -346,7 +346,7 @@
       },
       customButtons: {
         addClosureButton: {
-          text: 'Add Closure',
+          text: 'Add',
           click: function () {
             // Get the current date from the calendar
             const currentDate = calendar.view.currentStart;

@@ -111,7 +111,7 @@ if (isLoggedIn()) {
                         <div class="relative">
                             <input type="tel" id="phone" name="phone" placeholder="09123456789" pattern="09[0-9]{9}"
                                 title="Please enter an 11-digit phone number starting with 09 (e.g. 09123456789)."
-                                required
+                                required maxlength="11"
                                 class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white">
                             <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                                 <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor"
@@ -121,7 +121,13 @@ if (isLoggedIn()) {
                                 </svg>
                             </div>
                         </div>
-                        <p class="text-xs text-gray-500">Format: 09XXXXXXXXX (11 digits)</p>
+                        <p class="text-xs text-gray-500">Format: 09XXXXXXXXX (11 digits, numbers only)</p>
+                        <p id="phone-error" class="text-xs text-red-600 font-medium hidden">
+                            <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                            </svg>
+                            Letters are not allowed! Please enter numbers only.
+                        </p>
                     </div>
 
                     <!-- Address Field -->
@@ -248,5 +254,41 @@ if (isLoggedIn()) {
         </div>
     </div>
 </div>
+
+<script>
+// Phone number validation - prevent letters
+document.getElementById('phone').addEventListener('input', function(e) {
+    const errorMsg = document.getElementById('phone-error');
+    const value = e.target.value;
+
+    // Check if input contains non-numeric characters
+    if (/[^0-9]/.test(value)) {
+        // Remove non-numeric characters
+        e.target.value = value.replace(/[^0-9]/g, '');
+
+        // Show error message
+        errorMsg.classList.remove('hidden');
+        e.target.classList.add('border-red-500', 'focus:ring-red-500', 'focus:border-red-500');
+        e.target.classList.remove('border-gray-200', 'focus:ring-blue-500', 'focus:border-transparent');
+
+        // Hide error after 3 seconds
+        setTimeout(function() {
+            errorMsg.classList.add('hidden');
+            e.target.classList.remove('border-red-500', 'focus:ring-red-500', 'focus:border-red-500');
+            e.target.classList.add('border-gray-200', 'focus:ring-blue-500', 'focus:border-transparent');
+        }, 3000);
+    }
+});
+
+// Password toggle function
+function togglePassword(fieldId) {
+    const field = document.getElementById(fieldId);
+    if (field.type === 'password') {
+        field.type = 'text';
+    } else {
+        field.type = 'password';
+    }
+}
+</script>
 
 <?php require_once '../includes/footer.php'; ?>

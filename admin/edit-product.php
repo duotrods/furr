@@ -240,9 +240,10 @@ require_once __DIR__ . '/../includes/header.php';
                                 <div
                                     class="inline-flex items-center space-x-4 p-4 bg-gray-50 rounded-xl border-2 border-gray-100">
                                     <div class="flex-shrink-0">
-                                        <img src="../assets/uploads/<?php echo $product['image']; ?>"
+                                        <img src="../assets/uploads/<?php echo $product['image'] ?: 'default-product.svg'; ?>"
                                             alt="<?php echo htmlspecialchars($product['name']); ?>"
-                                            class="w-20 h-20 object-cover rounded-lg shadow-md border-2 border-white">
+                                            class="w-20 h-20 object-cover rounded-lg shadow-md border-2 border-white"
+                                            onerror="this.onerror=null; this.src='../assets/uploads/default-product.svg';">
                                     </div>
                                     <div>
                                         <p class="text-sm font-medium text-gray-700">Current Image</p>

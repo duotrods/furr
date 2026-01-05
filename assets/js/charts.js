@@ -189,139 +189,175 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize Inventory Chart if element exists
-    if (document.getElementById("inventory-chart") && typeof ApexCharts !== 'undefined' && window.productChartData) {
-        const { products, stocks, categories } = window.productChartData;
-        
-        // Generate color based on stock level
-        function getStockColor(stock) {
-            if (stock > 10) return "#10B981";  // Green for good stock
-            if (stock > 5) return "#F59E0B";   // Yellow for low stock
-            return "#EF4444";                  // Red for very low stock
-        }
-        
-        // Prepare series data with dynamic colors
-        const seriesData = products.map((product, index) => ({
-            x: product,
-            y: stocks[index],
-            fillColor: getStockColor(stocks[index]),
-            category: categories[index]
-        }));
-        
-        const inventoryChartOptions = {
-            series: [{
-                name: "Stock Level",
-                data: seriesData
-            }],
-            chart: {
-                type: "bar",
-                height: "320px",
-                fontFamily: "Inter, sans-serif",
-                toolbar: { show: false },
-                events: {
-                    dataPointSelection: function(event, chartContext, config) {
-                        const productName = config.w.config.series[0].data[config.dataPointIndex].x;
-                        const stockLevel = config.w.config.series[0].data[config.dataPointIndex].y;
-                        console.log(`Selected ${productName} with ${stockLevel} in stock`);
-                    }
-                }
-            },
-            plotOptions: {
-                bar: {
-                    horizontal: false,
-                    columnWidth: "60%",
-                    borderRadiusApplication: "end",
-                    borderRadius: 6,
-                    colors: {
-                        ranges: [{
-                            from: 0,
-                            to: 5,
-                            color: '#EF4444'
-                        }, {
-                            from: 6,
-                            to: 10,
-                            color: '#F59E0B'
-                        }, {
-                            from: 11,
-                            to: 9999,
-                            color: '#10B981'
-                        }]
-                    }
-                }
-            },
-            tooltip: {
-                enabled: true,
-                custom: function({ series, seriesIndex, dataPointIndex, w }) {
-                    const product = w.config.series[0].data[dataPointIndex].x;
-                    const stock = w.config.series[0].data[dataPointIndex].y;
-                    const category = w.config.series[0].data[dataPointIndex].category;
-                    
-                    return `
-                    <div class="bg-white shadow-lg rounded-lg p-4 border border-gray-200">
-                        <div class="font-bold text-gray-800">${product}</div>
-                        <div class="text-sm text-gray-600">${category}</div>
-                        <div class="mt-2 flex items-center">
-                            <span class="inline-block w-3 h-3 rounded-full mr-2" 
-                                   style="background-color: ${getStockColor(stock)}"></span>
-                            <span class="font-semibold">Stock: ${stock}</span>
-                        </div>
-                    </div>
-                    `;
-                }
-            },
-            xaxis: {
-                categories: products,
-                labels: {
-                    style: {
-                        fontFamily: "Inter, sans-serif",
-                        cssClass: 'text-xs font-normal fill-gray-500'
-                    },
-                    formatter: function(value) {
-                        return value.length > 12 ? value.substring(0, 10) + '...' : value;
-                    }
-                },
-                axisBorder: { show: false },
-                axisTicks: { show: false },
-            },
-            yaxis: {
-                show: true,
-                labels: {
-                    style: {
-                        fontFamily: "Inter, sans-serif",
-                        cssClass: 'text-xs font-normal fill-gray-500'
-                    }
-                },
-                title: {
-                    text: "Quantity",
-                    style: {
-                        cssClass: 'text-xs font-normal fill-gray-500'
-                    }
-                }
-            },
-            responsive: [{
-                breakpoint: 640,
-                options: {
-                    plotOptions: {
-                        bar: {
-                            columnWidth: "40%",
-                        }
-                    },
-                    xaxis: {
-                        labels: {
-                            rotate: -45
-                        }
-                    }
-                }
-            }]
-        };
+// Global variable to store the chart instance
+let inventoryChartInstance = null;
 
-        const inventoryChart = new ApexCharts(document.getElementById("inventory-chart"), inventoryChartOptions);
-        inventoryChart.render();
+// Filter function for inventory chart
+window.filterInventoryChart = function(filterType) {
+    // Update button styles
+    document.getElementById('filter-all').className = filterType === 'all'
+        ? 'px-3 py-1 text-sm rounded-md bg-blue-100 text-blue-700'
+        : 'px-3 py-1 text-sm rounded-md text-gray-600 hover:bg-gray-100';
+    document.getElementById('filter-low').className = filterType === 'low'
+        ? 'px-3 py-1 text-sm rounded-md bg-blue-100 text-blue-700'
+        : 'px-3 py-1 text-sm rounded-md text-gray-600 hover:bg-gray-100';
+
+    // Filter the data
+    let filteredProducts = window.allProductsData;
+    if (filterType === 'low') {
+        filteredProducts = window.allProductsData.filter(p => p.stock > 0 && p.stock < 10);
     }
 
-    // Your existing chart initialization code can remain below
-    if (typeof dashboardConfig !== 'undefined') {
-        // ... rest of your existing chart code ...
+    // Update total stock display
+    const totalStock = filteredProducts.reduce((sum, p) => sum + p.stock, 0);
+    const stockElement = document.querySelector('#inventory-chart').closest('.bg-white').querySelector('.leading-none');
+    if (stockElement) {
+        stockElement.textContent = totalStock;
+    }
+
+    // Update chart
+    renderInventoryChart(filteredProducts);
+};
+
+// Function to render the inventory chart
+function renderInventoryChart(productsData) {
+    // Generate color based on stock level
+    function getStockColor(stock) {
+        if (stock >= 10) return "#10B981";  // Green for good stock
+        if (stock > 5) return "#F59E0B";   // Yellow for low stock
+        return "#EF4444";                  // Red for very low stock
+    }
+
+    // Prepare series data
+    const seriesData = productsData.map(product => ({
+        x: product.name,
+        y: product.stock,
+        fillColor: getStockColor(product.stock),
+        category: product.category
+    }));
+
+    const inventoryChartOptions = {
+        series: [{
+            name: "Stock Level",
+            data: seriesData
+        }],
+        chart: {
+            type: "bar",
+            height: "320px",
+            fontFamily: "Inter, sans-serif",
+            toolbar: { show: false },
+            events: {
+                dataPointSelection: function(event, chartContext, config) {
+                    const productName = config.w.config.series[0].data[config.dataPointIndex].x;
+                    const stockLevel = config.w.config.series[0].data[config.dataPointIndex].y;
+                    console.log(`Selected ${productName} with ${stockLevel} in stock`);
+                }
+            }
+        },
+        plotOptions: {
+            bar: {
+                horizontal: false,
+                columnWidth: "60%",
+                borderRadiusApplication: "end",
+                borderRadius: 6,
+                distributed: true
+            }
+        },
+        tooltip: {
+            enabled: true,
+            custom: function({ series, seriesIndex, dataPointIndex, w }) {
+                const product = w.config.series[0].data[dataPointIndex].x;
+                const stock = w.config.series[0].data[dataPointIndex].y;
+                const category = w.config.series[0].data[dataPointIndex].category;
+
+                return `
+                <div class="bg-white shadow-lg rounded-lg p-4 border border-gray-200">
+                    <div class="font-bold text-gray-800">${product}</div>
+                    <div class="text-sm text-gray-600">${category}</div>
+                    <div class="mt-2 flex items-center">
+                        <span class="inline-block w-3 h-3 rounded-full mr-2"
+                               style="background-color: ${getStockColor(stock)}"></span>
+                        <span class="font-semibold">Stock: ${stock}</span>
+                    </div>
+                </div>
+                `;
+            }
+        },
+        xaxis: {
+            type: 'category',
+            labels: {
+                style: {
+                    fontFamily: "Inter, sans-serif",
+                    cssClass: 'text-xs font-normal fill-gray-500'
+                },
+                formatter: function(value) {
+                    return value && value.length > 12 ? value.substring(0, 10) + '...' : value;
+                }
+            },
+            axisBorder: { show: false },
+            axisTicks: { show: false },
+        },
+        yaxis: {
+            show: true,
+            labels: {
+                style: {
+                    fontFamily: "Inter, sans-serif",
+                    cssClass: 'text-xs font-normal fill-gray-500'
+                }
+            },
+            title: {
+                text: "Quantity",
+                style: {
+                    cssClass: 'text-xs font-normal fill-gray-500'
+                }
+            }
+        },
+        legend: {
+            show: false
+        },
+        dataLabels: {
+            enabled: false
+        },
+        responsive: [{
+            breakpoint: 640,
+            options: {
+                plotOptions: {
+                    bar: {
+                        columnWidth: "40%",
+                    }
+                },
+                xaxis: {
+                    labels: {
+                        rotate: -45
+                    }
+                }
+            }
+        }]
+    };
+
+    // Destroy existing chart if it exists
+    if (inventoryChartInstance) {
+        inventoryChartInstance.destroy();
+    }
+
+    // Create and render new chart
+    inventoryChartInstance = new ApexCharts(document.getElementById("inventory-chart"), inventoryChartOptions);
+    inventoryChartInstance.render();
+}
+
+// Initialize inventory chart on page load
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof window.allProductsData !== 'undefined' && document.getElementById("inventory-chart")) {
+        // Get initial filter from server or default to 'all'
+        const initialFilter = window.currentInventoryFilter || 'all';
+
+        // Filter data if needed
+        let initialProducts = window.allProductsData;
+        if (initialFilter === 'low') {
+            initialProducts = window.allProductsData.filter(p => p.stock > 0 && p.stock < 10);
+        }
+
+        // Render the initial chart
+        renderInventoryChart(initialProducts);
     }
 });

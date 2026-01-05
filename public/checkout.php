@@ -124,10 +124,17 @@ $user = getUser();
                                                 </path>
                                             </svg>
                                         </div>
-                                        <input type="tel" id="phone" name="phone" required
+                                        <input type="tel" id="phone" name="phone" required maxlength="11"
+                                            pattern="09[0-9]{9}" title="Please enter an 11-digit phone number starting with 09"
                                             value="<?php echo $user['phone']; ?>"
                                             class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 bg-gray-50 focus:bg-white">
                                     </div>
+                                    <p id="phone-error-checkout" class="text-xs text-red-600 font-medium hidden">
+                                        <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                        </svg>
+                                        Letters are not allowed! Please enter numbers only.
+                                    </p>
                                 </div>
                             </div>
 
@@ -166,14 +173,15 @@ $user = getUser();
 
                             <!-- Submit Button -->
                             <div class="pt-6">
-                                <button type="submit"
+                                <button type="button" onclick="showPreviewModal()"
                                     class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg flex items-center justify-center space-x-2">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
-                                        </path>
+                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                                     </svg>
-                                    <span>Place Secure Order</span>
+                                    <span>Review Order</span>
                                 </button>
                             </div>
                         </form>
@@ -206,9 +214,10 @@ $user = getUser();
                                 <div
                                     class="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl border border-gray-200 hover:shadow-md transition-all duration-200">
                                     <div class="flex-shrink-0">
-                                        <img src="../assets/uploads/<?php echo $product['image'] ?: 'default-product.jpg'; ?>"
+                                        <img src="../assets/uploads/<?php echo $product['image'] ?: 'default-product.svg'; ?>"
                                             alt="<?php echo $product['name']; ?>"
-                                            class="w-20 h-20 object-cover rounded-lg border-2 border-white shadow-sm">
+                                            class="w-20 h-20 object-cover rounded-lg border-2 border-white shadow-sm"
+                                            onerror="this.onerror=null; this.src='../assets/uploads/default-product.svg';">
                                     </div>
                                     <div class="flex-1 min-w-0">
                                         <h3 class="font-semibold text-gray-900 truncate"><?php echo $product['name']; ?>
@@ -255,5 +264,164 @@ $user = getUser();
         </div>
     </div>
 </div>
+
+<!-- Order Preview Modal -->
+<div id="previewModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-50" style="display: none;">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <div class="bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-6 rounded-t-2xl sticky top-0 z-10">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h3 class="text-2xl font-bold text-white">Order Confirmation</h3>
+                    <p class="text-blue-100 mt-1">Please review your order details before confirming</p>
+                </div>
+                <button onclick="hidePreviewModal()" type="button" class="text-white hover:text-gray-200 transition-colors duration-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="p-8 space-y-6">
+            <!-- Personal Information -->
+            <div class="border-2 border-gray-200 rounded-xl p-6 bg-gray-50">
+                <h4 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                    Personal Information
+                </h4>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-sm text-gray-600">Name</p>
+                        <p id="preview-name" class="font-semibold text-gray-900"></p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Email</p>
+                        <p id="preview-email" class="font-semibold text-gray-900"></p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Phone</p>
+                        <p id="preview-phone" class="font-semibold text-gray-900"></p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Payment Method</p>
+                        <p id="preview-payment" class="font-semibold text-gray-900">GCash</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shipping Address -->
+            <div class="border-2 border-gray-200 rounded-xl p-6 bg-gray-50">
+                <h4 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    Shipping Address
+                </h4>
+                <p id="preview-address" class="text-gray-900"></p>
+            </div>
+
+            <!-- Order Items -->
+            <div class="border-2 border-gray-200 rounded-xl p-6 bg-gray-50">
+                <h4 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                    </svg>
+                    Order Items
+                </h4>
+                <div class="space-y-3">
+                    <?php foreach ($cartItems as $product_id => $quantity):
+                        $product = getProductById($product_id);
+                        if (!$product) continue;
+                    ?>
+                        <div class="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200">
+                            <div class="flex items-center space-x-3">
+                                <img src="../assets/uploads/<?php echo $product['image'] ?: 'default-product.svg'; ?>"
+                                    alt="<?php echo $product['name']; ?>"
+                                    class="w-12 h-12 object-cover rounded-md"
+                                    onerror="this.onerror=null; this.src='../assets/uploads/default-product.svg';">
+                                <div>
+                                    <p class="font-semibold text-gray-900"><?php echo htmlspecialchars($product['name']); ?></p>
+                                    <p class="text-sm text-gray-600">Quantity: <?php echo $quantity; ?></p>
+                                </div>
+                            </div>
+                            <p class="font-bold text-gray-900">₱<?php echo number_format($product['price'] * $quantity, 2); ?></p>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+
+            <!-- Total Amount -->
+            <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border-2 border-green-200">
+                <div class="flex justify-between items-center">
+                    <span class="text-xl font-bold text-gray-900">Total Amount</span>
+                    <span class="text-3xl font-bold text-green-600">₱<?php echo number_format(calculateCartTotal(), 2); ?></span>
+                </div>
+                <p class="text-sm text-gray-600 mt-1">Including all applicable taxes</p>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex space-x-4 pt-4">
+                <button type="button" onclick="hidePreviewModal()"
+                    class="flex-1 px-6 py-3 bg-gray-200 text-gray-800 font-semibold rounded-xl hover:bg-gray-300 transition-colors duration-200">
+                    Edit Order
+                </button>
+                <button type="button" onclick="confirmOrder()"
+                    class="flex-1 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center space-x-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span>Confirm & Place Order</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showPreviewModal() {
+    // Validate form first
+    const form = document.getElementById('checkout-form');
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+
+    // Populate preview data
+    const firstName = document.getElementById('first_name').value;
+    const lastName = document.getElementById('last_name').value;
+    const email = document.getElementById('email').value;
+    const phone = document.getElementById('phone').value;
+    const address = document.getElementById('shipping_address').value;
+
+    document.getElementById('preview-name').textContent = firstName + ' ' + lastName;
+    document.getElementById('preview-email').textContent = email;
+    document.getElementById('preview-phone').textContent = phone;
+    document.getElementById('preview-address').textContent = address;
+
+    // Show modal
+    document.getElementById('previewModal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function hidePreviewModal() {
+    document.getElementById('previewModal').style.display = 'none';
+    document.body.style.overflow = 'auto';
+}
+
+function confirmOrder() {
+    // Submit the form
+    document.getElementById('checkout-form').submit();
+}
+
+// Close modal when clicking outside
+document.getElementById('previewModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        hidePreviewModal();
+    }
+});
+</script>
 
 <?php require_once '../includes/footer.php'; ?>

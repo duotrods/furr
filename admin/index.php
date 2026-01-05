@@ -123,6 +123,106 @@ $inventoryFilter = $_GET['inventory_filter'] ?? 'all';
                 </div>
             </div>
         </div>
+
+        <!-- Expiry Notifications -->
+        <?php
+        // Get products expiring soon (within 7 days)
+        $stmt = $pdo->prepare("SELECT * FROM products
+                               WHERE expiry <= DATE_ADD(CURRENT_DATE, INTERVAL 7 DAY)
+                               AND expiry >= CURRENT_DATE
+                               ORDER BY expiry ASC");
+        $stmt->execute();
+        $expiring_products = $stmt->fetchAll();
+
+        // Get expired products
+        $stmt = $pdo->prepare("SELECT * FROM products
+                               WHERE expiry < CURRENT_DATE
+                               ORDER BY expiry DESC");
+        $stmt->execute();
+        $expired_products = $stmt->fetchAll();
+        ?>
+
+        <?php if (!empty($expiring_products) || !empty($expired_products)): ?>
+            <div class="mt-6">
+                <?php if (!empty($expired_products)): ?>
+                    <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-4 rounded-r-lg">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div class="ml-3 flex-1">
+                                <h3 class="text-sm font-semibold text-red-800">
+                                    <i class="fas fa-exclamation-circle mr-1"></i>
+                                    Expired Products (<?php echo count($expired_products); ?>)
+                                </h3>
+                                <div class="mt-2 text-sm text-red-700">
+                                    <ul class="list-disc list-inside space-y-1">
+                                        <?php foreach (array_slice($expired_products, 0, 3) as $product): ?>
+                                            <li>
+                                                <strong><?php echo htmlspecialchars($product['name']); ?></strong> -
+                                                Expired on <?php echo date('M j, Y', strtotime($product['expiry'])); ?>
+                                            </li>
+                                        <?php endforeach; ?>
+                                        <?php if (count($expired_products) > 3): ?>
+                                            <li class="text-red-600">
+                                                ...and <?php echo count($expired_products) - 3; ?> more
+                                            </li>
+                                        <?php endif; ?>
+                                    </ul>
+                                </div>
+                                <div class="mt-3">
+                                    <a href="products.php?filter=expired" class="text-sm font-medium text-red-800 hover:text-red-900 underline">
+                                        View All Expired Products <i class="fas fa-arrow-right ml-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
+                <?php if (!empty($expiring_products)): ?>
+                    <div class="bg-orange-50 border-l-4 border-orange-400 p-4 rounded-r-lg">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-orange-400" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div class="ml-3 flex-1">
+                                <h3 class="text-sm font-semibold text-orange-800">
+                                    <i class="fas fa-exclamation-triangle mr-1"></i>
+                                    Products Expiring Soon (<?php echo count($expiring_products); ?>)
+                                </h3>
+                                <div class="mt-2 text-sm text-orange-700">
+                                    <ul class="list-disc list-inside space-y-1">
+                                        <?php foreach (array_slice($expiring_products, 0, 3) as $product):
+                                            $days_until_expiry = (strtotime($product['expiry']) - time()) / (60 * 60 * 24);
+                                        ?>
+                                            <li>
+                                                <strong><?php echo htmlspecialchars($product['name']); ?></strong> -
+                                                Expires in <?php echo ceil($days_until_expiry); ?> day(s) (<?php echo date('M j, Y', strtotime($product['expiry'])); ?>)
+                                            </li>
+                                        <?php endforeach; ?>
+                                        <?php if (count($expiring_products) > 3): ?>
+                                            <li class="text-orange-600">
+                                                ...and <?php echo count($expiring_products) - 3; ?> more
+                                            </li>
+                                        <?php endif; ?>
+                                    </ul>
+                                </div>
+                                <div class="mt-3">
+                                    <a href="products.php?filter=near_expiry&expiry_days=7" class="text-sm font-medium text-orange-800 hover:text-orange-900 underline">
+                                        View All Expiring Products <i class="fas fa-arrow-right ml-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
     </div>
 
     <!-- charts for appointments and Product -->
@@ -622,7 +722,7 @@ $inventoryFilter = $_GET['inventory_filter'] ?? 'all';
                                 <?php
                                 if ($inventoryFilter === 'low') {
                                     $lowStockProducts = array_filter($products, function ($product) {
-                                        return $product['stock'] <= 10; // Adjust threshold as needed
+                                        return $product['stock'] > 0 && $product['stock'] < 10;
                                     });
                                     echo array_sum(array_column($lowStockProducts, 'stock'));
                                 } else {
@@ -642,29 +742,29 @@ $inventoryFilter = $_GET['inventory_filter'] ?? 'all';
                             Stock Overview
                         </span>
                         <div class="bg-white border border-gray-200 rounded-lg p-1">
-                            <a href="?appointment_filter=<?php echo $appointmentFilter; ?>&sales_filter=<?php echo $salesFilter; ?>&inventory_filter=all"
+                            <button type="button" onclick="filterInventoryChart('all')" id="filter-all"
                                 class="px-3 py-1 text-sm rounded-md <?php echo $inventoryFilter === 'all' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'; ?>">
                                 All Stock
-                            </a>
-                            <a href="?appointment_filter=<?php echo $appointmentFilter; ?>&sales_filter=<?php echo $salesFilter; ?>&inventory_filter=low"
+                            </button>
+                            <button type="button" onclick="filterInventoryChart('low')" id="filter-low"
                                 class="px-3 py-1 text-sm rounded-md <?php echo $inventoryFilter === 'low' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'; ?>">
                                 Low Stock
-                            </a>
+                            </button>
                         </div>
                     </div>
                 </div>
                 <div id="inventory-chart"></div>
                 <script>
-                    // Pass the PHP data to JavaScript
-                    window.productChartData = {
-                        products: <?php echo json_encode(array_column($products, 'name')); ?>,
-                        stocks: <?php echo json_encode(array_column($products, 'stock')); ?>,
-                        categories: <?php echo json_encode(array_map(function ($p) {
-                            return getProductCategoryById($p['category_id'])['name'];
-                        }, $products)); ?>,
-                        totalStock: <?php echo array_sum(array_column($products, 'stock')); ?>,
-                        inventoryFilter: '<?php echo $inventoryFilter; ?>'
-                    };
+                    // Pass ALL products data to JavaScript for client-side filtering
+                    window.allProductsData = <?php echo json_encode(array_map(function($p) {
+                        return [
+                            'name' => $p['name'],
+                            'stock' => (int)$p['stock'],
+                            'category' => getProductCategoryById($p['category_id'])['name']
+                        ];
+                    }, $products)); ?>;
+
+                    window.currentInventoryFilter = '<?php echo $inventoryFilter; ?>';
                 </script>
             </div>
         </div>

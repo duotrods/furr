@@ -113,6 +113,32 @@ $category = $_GET['category'] ?? 'all';
                     <input type="hidden" name="type" value="<?php echo $report_type; ?>">
 
                     <?php if ($report_type == 'appointments'): ?>
+                        <!-- Quick Time Period Filters -->
+                        <div class="mb-4">
+                            <div class="flex flex-wrap gap-2">
+                                <a href="reports.php?type=appointments&start_date=<?php echo date('Y-m-d'); ?>&end_date=<?php echo date('Y-m-d'); ?>"
+                                    class="px-3 py-1.5 text-sm bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition">
+                                    Today
+                                </a>
+                                <a href="reports.php?type=appointments&start_date=<?php echo date('Y-m-d', strtotime('-7 days')); ?>&end_date=<?php echo date('Y-m-d'); ?>"
+                                    class="px-3 py-1.5 text-sm bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition">
+                                    Last 7 Days
+                                </a>
+                                <a href="reports.php?type=appointments&start_date=<?php echo date('Y-m-01'); ?>&end_date=<?php echo date('Y-m-t'); ?>"
+                                    class="px-3 py-1.5 text-sm bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition">
+                                    This Month
+                                </a>
+                                <a href="reports.php?type=appointments&start_date=<?php echo date('Y-01-01'); ?>&end_date=<?php echo date('Y-12-31'); ?>"
+                                    class="px-3 py-1.5 text-sm bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition">
+                                    This Year
+                                </a>
+                                <a href="reports.php?type=appointments&start_date=<?php echo date('Y-01-01', strtotime('-1 year')); ?>&end_date=<?php echo date('Y-12-31', strtotime('-1 year')); ?>"
+                                    class="px-3 py-1.5 text-sm bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition">
+                                    Last Year
+                                </a>
+                            </div>
+                        </div>
+
                         <!-- Appointments Layout: 4 columns -->
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             <div>
@@ -158,6 +184,32 @@ $category = $_GET['category'] ?? 'all';
                             </div>
                         </div>
                     <?php else: ?>
+                        <!-- Quick Time Period Filters -->
+                        <div class="mb-4">
+                            <div class="flex flex-wrap gap-2">
+                                <a href="reports.php?type=<?php echo $report_type; ?>&start_date=<?php echo date('Y-m-d'); ?>&end_date=<?php echo date('Y-m-d'); ?>&category=<?php echo $category; ?>"
+                                    class="px-3 py-1.5 text-sm bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition">
+                                    Today
+                                </a>
+                                <a href="reports.php?type=<?php echo $report_type; ?>&start_date=<?php echo date('Y-m-d', strtotime('-7 days')); ?>&end_date=<?php echo date('Y-m-d'); ?>&category=<?php echo $category; ?>"
+                                    class="px-3 py-1.5 text-sm bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition">
+                                    Last 7 Days
+                                </a>
+                                <a href="reports.php?type=<?php echo $report_type; ?>&start_date=<?php echo date('Y-m-01'); ?>&end_date=<?php echo date('Y-m-t'); ?>&category=<?php echo $category; ?>"
+                                    class="px-3 py-1.5 text-sm bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition">
+                                    This Month
+                                </a>
+                                <a href="reports.php?type=<?php echo $report_type; ?>&start_date=<?php echo date('Y-01-01'); ?>&end_date=<?php echo date('Y-12-31'); ?>&category=<?php echo $category; ?>"
+                                    class="px-3 py-1.5 text-sm bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition">
+                                    This Year
+                                </a>
+                                <a href="reports.php?type=<?php echo $report_type; ?>&start_date=<?php echo date('Y-01-01', strtotime('-1 year')); ?>&end_date=<?php echo date('Y-12-31', strtotime('-1 year')); ?>&category=<?php echo $category; ?>"
+                                    class="px-3 py-1.5 text-sm bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition">
+                                    Last Year
+                                </a>
+                            </div>
+                        </div>
+
                         <!-- Sales Layout: All in one row -->
                         <div class="flex flex-wrap gap-4 items-end">
                             <div class="flex-1 min-w-[200px]">
@@ -203,8 +255,8 @@ $category = $_GET['category'] ?? 'all';
                                 </button>
                             </div>
                             <div class="flex-shrink-0">
-                                <button onclick="window.print()"
-                                    class="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg transition duration-300 shadow-sm flex items-center justify-center">
+                                <button type="button" onclick="window.print()"
+                                    class="bg-yellow-400 hover:bg-yellow-600 text-white font-semibold py-3 px-6 rounded-lg transition duration-300 shadow-sm flex items-center justify-center">
                                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z">
@@ -248,6 +300,14 @@ $category = $_GET['category'] ?? 'all';
                                 d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
                         </svg>
                         Product Sales
+                    </a>
+                    <a href="reports.php?type=orders"
+                        class="flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors <?php echo $report_type == 'orders' ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-600 hover:text-blue-600 hover:bg-blue-50'; ?>">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                        </svg>
+                        Order Reports
                     </a>
                 </nav>
             </div>
@@ -478,6 +538,124 @@ ORDER BY a.appointment_date DESC, a.appointment_time DESC");
                                         <td class="px-6 py-4">
                                             <div class="text-lg font-bold text-green-600">
                                                 ₱<?php echo number_format(array_sum(array_column($sales_data, 'total_amount')), 2); ?>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+
+                <?php elseif ($report_type == 'orders'): ?>
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-bold text-gray-900 mb-2">Order Reports</h2>
+                        <p class="text-gray-600">Complete order overview from <?php echo formatDate($start_date); ?> to
+                            <?php echo formatDate($end_date); ?>
+                        </p>
+                    </div>
+
+                    <?php
+                    // Get all orders within the date range
+                    $sql = "SELECT o.*, u.first_name, u.last_name, u.email, u.phone
+                            FROM orders o
+                            JOIN users u ON o.user_id = u.id
+                            WHERE o.status IN ('confirmed', 'shipped', 'completed')
+                            AND o.order_date BETWEEN ? AND ?
+                            ORDER BY o.order_date DESC, o.id DESC";
+                    $stmt = $pdo->prepare($sql);
+                    $stmt->execute([$start_date, $end_date]);
+                    $orders_report = $stmt->fetchAll();
+                    ?>
+
+                    <div class="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th
+                                            class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                            Order ID</th>
+                                        <th
+                                            class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                            Customer</th>
+                                        <th
+                                            class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                            Order Date</th>
+                                        <th
+                                            class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                            Items</th>
+                                        <th
+                                            class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                            Status</th>
+                                        <th
+                                            class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                            Total Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-100">
+                                    <?php foreach ($orders_report as $order):
+                                        // Get order items count
+                                        $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM order_items WHERE order_id = ?");
+                                        $stmt->execute([$order['id']]);
+                                        $item_count = $stmt->fetch()['count'];
+                                    ?>
+                                        <tr class="hover:bg-gray-50 transition-colors">
+                                            <td class="px-6 py-4">
+                                                <div class="text-sm font-semibold text-gray-900">
+                                                    #<?php echo str_pad($order['id'], 5, '0', STR_PAD_LEFT); ?>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <div class="text-sm font-semibold text-gray-900">
+                                                    <?php echo $order['first_name'] . ' ' . $order['last_name']; ?>
+                                                </div>
+                                                <div class="text-sm text-gray-500"><?php echo $order['email']; ?></div>
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <div class="text-sm font-medium text-gray-900">
+                                                    <?php echo formatDate($order['order_date']); ?>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                                                    <?php echo $item_count; ?> item<?php echo $item_count != 1 ? 's' : ''; ?>
+                                                </span>
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full
+                                                    <?php
+                                                    echo $order['status'] == 'confirmed' ? 'bg-green-100 text-green-800' :
+                                                        ($order['status'] == 'shipped' ? 'bg-blue-100 text-blue-800' :
+                                                            ($order['status'] == 'completed' ? 'bg-purple-100 text-purple-800' :
+                                                                'bg-gray-100 text-gray-800'));
+                                                    ?>">
+                                                    <?php echo ucfirst($order['status']); ?>
+                                                </span>
+                                            </td>
+                                            <td class="px-6 py-4">
+                                                <div class="text-sm font-semibold text-gray-900">
+                                                    ₱<?php echo number_format($order['total_amount'], 2); ?>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                                <tfoot class="bg-gray-50">
+                                    <tr>
+                                        <td colspan="5" class="px-6 py-4 text-right text-sm font-bold text-gray-900">Total
+                                            Revenue:</td>
+                                        <td class="px-6 py-4">
+                                            <div class="text-lg font-bold text-green-600">
+                                                ₱<?php echo number_format(array_sum(array_column($orders_report, 'total_amount')), 2); ?>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="5" class="px-6 py-4 text-right text-sm font-bold text-gray-900">Total
+                                            Orders:</td>
+                                        <td class="px-6 py-4">
+                                            <div class="text-lg font-bold text-blue-600">
+                                                <?php echo count($orders_report); ?>
                                             </div>
                                         </td>
                                     </tr>

@@ -3,7 +3,43 @@
 <?php require_once __DIR__ . '/../includes/header.php'; ?>
 <?php
 $category_id = $_GET['category_id'] ?? null;
-$products = $category_id ? getProductsByCategory($category_id) : getAllProducts();
+$filter = $_GET['filter'] ?? 'all';
+$expiry_days = $_GET['expiry_days'] ?? 7;
+
+// Build the query based on filters
+$sql = "SELECT * FROM products WHERE 1=1";
+$params = [];
+
+if ($category_id) {
+    $sql .= " AND category_id = ?";
+    $params[] = $category_id;
+}
+
+switch ($filter) {
+    case 'near_expiry':
+        $sql .= " AND expiry <= DATE_ADD(CURRENT_DATE, INTERVAL ? DAY) AND expiry >= CURRENT_DATE";
+        $params[] = $expiry_days;
+        break;
+    case 'expired':
+        $sql .= " AND expiry < CURRENT_DATE";
+        break;
+    case 'low_stock':
+        $sql .= " AND stock > 0 AND stock < 10";
+        break;
+    case 'out_of_stock':
+        $sql .= " AND stock = 0";
+        break;
+    case 'in_stock':
+        $sql .= " AND stock >= 10";
+        break;
+}
+
+$sql .= " ORDER BY id DESC";
+
+$stmt = $pdo->prepare($sql);
+$stmt->execute($params);
+$products = $stmt->fetchAll();
+
 $categories = getProductCategories();
 ?>
 
@@ -57,24 +93,26 @@ $categories = getProductCategories();
                     <h1 class="text-4xl font-bold text-white mb-2">Product Management</h1>
                     <p class="text-blue-100">Manage your inventory with ease</p>
                 </div>
-                <a href="add-product.php"
-                    class="bg-white hover:bg-gray-100 text-blue-600 font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300 action-btn">
-                    <i class="fas fa-plus mr-2"></i>Add New Product
-                </a>
+                <div class="flex gap-3">
+                    <a href="manage-categories.php"
+                        class="bg-white hover:bg-gray-100 text-blue-600 font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300 action-btn">
+                        <i class="fas fa-tags mr-2"></i>Manage Categories
+                    </a>
+                    <a href="add-product.php"
+                        class="bg-white hover:bg-gray-100 text-blue-600 font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300 action-btn">
+                        <i class="fas fa-plus mr-2"></i>Add New Product
+                    </a>
+                </div>
             </div>
         </div>
     </div>
 
     <div class="container mx-auto px-6 py-8">
         <!-- Stats Overview -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div class="stats-card rounded-xl p-6 text-center shadow-sm">
                 <div class="text-3xl font-bold text-blue-600 mb-2"><?php echo count($products); ?></div>
                 <div class="text-gray-600 font-medium">Total Products</div>
-            </div>
-            <div class="stats-card rounded-xl p-6 text-center shadow-sm">
-                <div class="text-3xl font-bold text-green-600 mb-2"><?php echo count($categories); ?></div>
-                <div class="text-gray-600 font-medium">Categories</div>
             </div>
             <div class="stats-card rounded-xl p-6 text-center shadow-sm">
                 <div class="text-3xl font-bold text-purple-600 mb-2">
@@ -88,7 +126,7 @@ $categories = getProductCategories();
                         return $p['price'] * $p['stock'];
                     }, $products)), 2); ?>
                 </div>
-                <div class="text-gray-600 font-medium">Total Value</div>
+                <div class="text-gray-600 font-medium">Total Worth of Products</div>
             </div>
         </div>
 
@@ -98,17 +136,63 @@ $categories = getProductCategories();
             <div class="bg-gradient-to-r from-gray-50 to-white p-6 border-b border-gray-200">
                 <h3 class="text-lg font-semibold text-gray-800 mb-4">Filter by Category</h3>
                 <div class="flex flex-wrap gap-3">
-                    <a href="products.php"
+                    <a href="products.php?filter=<?php echo $filter; ?>"
                         class="category-filter px-6 py-3 rounded-full font-medium shadow-sm <?php echo !$category_id ? 'bg-blue-600 text-white shadow-blue-200' : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'; ?>">
                         <i class="fas fa-th-large mr-2"></i>All Products
                     </a>
                     <?php foreach ($categories as $category): ?>
-                        <a href="products.php?category_id=<?php echo $category['id']; ?>"
+                        <a href="products.php?category_id=<?php echo $category['id']; ?>&filter=<?php echo $filter; ?>"
                             class="category-filter px-6 py-3 rounded-full font-medium shadow-sm <?php echo $category_id == $category['id'] ? 'bg-blue-600 text-white shadow-blue-200' : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'; ?>">
                             <i class="fas fa-tag mr-2"></i><?php echo $category['name']; ?>
                         </a>
                     <?php endforeach; ?>
                 </div>
+            </div>
+
+            <!-- Advanced Filters -->
+            <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-lg font-semibold text-gray-800">
+                        <i class="fas fa-filter mr-2"></i>Advanced Filters
+                    </h3>
+                </div>
+                <div class="flex flex-wrap gap-3">
+                    <a href="products.php?<?php echo $category_id ? 'category_id=' . $category_id . '&' : ''; ?>filter=all"
+                        class="category-filter px-4 py-2 rounded-lg text-sm font-medium shadow-sm <?php echo $filter == 'all' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'; ?>">
+                        <i class="fas fa-list mr-1"></i>All
+                    </a>
+                    <a href="products.php?<?php echo $category_id ? 'category_id=' . $category_id . '&' : ''; ?>filter=near_expiry&expiry_days=7"
+                        class="category-filter px-4 py-2 rounded-lg text-sm font-medium shadow-sm <?php echo $filter == 'near_expiry' ? 'bg-yellow-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'; ?>">
+                        <i class="fas fa-exclamation-triangle mr-1"></i>Near Expiry (<?php echo $expiry_days; ?> days)
+                    </a>
+                    <a href="products.php?<?php echo $category_id ? 'category_id=' . $category_id . '&' : ''; ?>filter=expired"
+                        class="category-filter px-4 py-2 rounded-lg text-sm font-medium shadow-sm <?php echo $filter == 'expired' ? 'bg-red-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'; ?>">
+                        <i class="fas fa-times-circle mr-1"></i>Expired
+                    </a>
+                    <a href="products.php?<?php echo $category_id ? 'category_id=' . $category_id . '&' : ''; ?>filter=in_stock"
+                        class="category-filter px-4 py-2 rounded-lg text-sm font-medium shadow-sm <?php echo $filter == 'in_stock' ? 'bg-green-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'; ?>">
+                        <i class="fas fa-check-circle mr-1"></i>In Stock
+                    </a>
+                    <a href="products.php?<?php echo $category_id ? 'category_id=' . $category_id . '&' : ''; ?>filter=low_stock"
+                        class="category-filter px-4 py-2 rounded-lg text-sm font-medium shadow-sm <?php echo $filter == 'low_stock' ? 'bg-yellow-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'; ?>">
+                        <i class="fas fa-exclamation-circle mr-1"></i>Low Stock
+                    </a>
+                    <a href="products.php?<?php echo $category_id ? 'category_id=' . $category_id . '&' : ''; ?>filter=out_of_stock"
+                        class="category-filter px-4 py-2 rounded-lg text-sm font-medium shadow-sm <?php echo $filter == 'out_of_stock' ? 'bg-gray-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'; ?>">
+                        <i class="fas fa-ban mr-1"></i>Out of Stock
+                    </a>
+                </div>
+                <?php if ($filter == 'near_expiry'): ?>
+                    <div class="mt-3">
+                        <label for="expiry_days_select" class="text-sm text-gray-600 mr-2">Show products expiring within:</label>
+                        <select id="expiry_days_select" onchange="window.location.href='products.php?<?php echo $category_id ? 'category_id=' . $category_id . '&' : ''; ?>filter=near_expiry&expiry_days='+this.value" class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm">
+                            <option value="3" <?php echo $expiry_days == 3 ? 'selected' : ''; ?>>3 days</option>
+                            <option value="7" <?php echo $expiry_days == 7 ? 'selected' : ''; ?>>7 days</option>
+                            <option value="14" <?php echo $expiry_days == 14 ? 'selected' : ''; ?>>14 days</option>
+                            <option value="30" <?php echo $expiry_days == 30 ? 'selected' : ''; ?>>30 days</option>
+                        </select>
+                    </div>
+                <?php endif; ?>
             </div>
 
             <!-- Products Table -->
@@ -142,9 +226,10 @@ $categories = getProductCategories();
                                 <td class="px-8 py-6">
                                     <div class="flex items-center space-x-4">
                                         <div class="relative">
-                                            <img src="../assets/uploads/<?php echo $product['image'] ?: 'default-product.jpg'; ?>"
+                                            <img src="../assets/uploads/<?php echo $product['image'] ?: 'default-product.svg'; ?>"
                                                 alt="<?php echo $product['name']; ?>"
-                                                class="w-12 h-12 object-cover rounded-xl shadow-md">
+                                                class="w-12 h-12 object-cover rounded-xl shadow-md"
+                                                onerror="this.onerror=null; this.src='../assets/uploads/default-product.svg';">
                                         </div>
                                     </div>
                                 </td>

@@ -100,8 +100,9 @@
                 <div
                     class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full">
                     <div class="relative overflow-hidden">
-                        <img src="../assets/uploads/<?php echo $product['image']; ?>" alt="<?php echo $product['name']; ?>"
-                            class="w-full h-48 object-cover transition-transform duration-300 hover:scale-110">
+                        <img src="../assets/uploads/<?php echo $product['image'] ?: 'default-product.svg'; ?>" alt="<?php echo $product['name']; ?>"
+                            class="w-full h-48 object-cover transition-transform duration-300 hover:scale-110"
+                            onerror="this.onerror=null; this.src='../assets/uploads/default-product.svg';">
                         <div class="absolute top-4 right-4">
                             <span class="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
                                 New

@@ -204,20 +204,23 @@ function getAllAppointments($status = null)
 {
     global $pdo;
 
-    $sql = "SELECT a.*, s.name as service_name, s.price as service_price, 
-                    u.first_name, u.last_name, u.email, u.phone 
-                FROM appointments a 
-                JOIN services s ON a.service_id = s.id 
-                JOIN users u ON a.user_id = u.id
-            
-            ";
+    $sql = "SELECT a.*, s.name as service_name, s.price as service_price,
+                    u.first_name, u.last_name, u.email, u.phone
+                FROM appointments a
+                JOIN services s ON a.service_id = s.id
+                JOIN users u ON a.user_id = u.id";
 
     if ($status) {
         $sql .= " WHERE a.status = ?";
-        $stmt = $pdo->prepare($sql);
+    }
+
+    $sql .= " ORDER BY a.appointment_date DESC, a.appointment_time DESC";
+
+    $stmt = $pdo->prepare($sql);
+
+    if ($status) {
         $stmt->execute([$status]);
     } else {
-        $stmt = $pdo->prepare($sql);
         $stmt->execute();
     }
 
@@ -229,20 +232,23 @@ function getAllAppointments2($status = null)
 {
     global $pdo;
 
-    $sql = "SELECT a.*, s.name as service_name, s.price as service_price, 
-                    u.first_name, u.last_name, u.email, u.phone 
-                FROM appointments a 
-                JOIN services s ON a.service_id = s.id 
-                JOIN users u ON a.user_id = u.id
-                ORDER BY a.appointment_date DESC, a.appointment_time DESC
-            ";
+    $sql = "SELECT a.*, s.name as service_name, s.price as service_price,
+                    u.first_name, u.last_name, u.email, u.phone
+                FROM appointments a
+                JOIN services s ON a.service_id = s.id
+                JOIN users u ON a.user_id = u.id";
 
     if ($status) {
         $sql .= " WHERE a.status = ?";
-        $stmt = $pdo->prepare($sql);
+    }
+
+    $sql .= " ORDER BY a.appointment_date DESC, a.appointment_time DESC";
+
+    $stmt = $pdo->prepare($sql);
+
+    if ($status) {
         $stmt->execute([$status]);
     } else {
-        $stmt = $pdo->prepare($sql);
         $stmt->execute();
     }
 

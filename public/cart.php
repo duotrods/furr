@@ -92,9 +92,10 @@ require_once '../includes/header.php';  ?>
                                     <!-- Product Info -->
                                     <div class="col-span-1 lg:col-span-5 flex items-center mb-4 lg:mb-0">
                                         <div class="w-20 h-20 lg:w-16 lg:h-16 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0 mr-4">
-                                            <img src="../assets/uploads/<?php echo $product['image'] ?: 'default-product.jpg'; ?>"
+                                            <img src="../assets/uploads/<?php echo $product['image'] ?: 'default-product.svg'; ?>"
                                                 alt="<?php echo $product['name']; ?>"
-                                                class="w-full h-full object-cover">
+                                                class="w-full h-full object-cover"
+                                                onerror="this.onerror=null; this.src='../assets/uploads/default-product.svg';">
                                         </div>
                                         <div class="flex-1">
                                             <h3 class="font-semibold text-gray-900 text-lg mb-1"><?php echo $product['name']; ?></h3>

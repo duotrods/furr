@@ -38,6 +38,13 @@ try {
     }
 
     if ($action === 'approve') {
+        // Check if user's email is verified
+        if (!$user['is_verified']) {
+            $_SESSION['error_message'] = "Cannot approve user - email not verified. User must verify their email address first.";
+            header('Location: ' . BASE_URL . '/admin/manage-registrations.php');
+            exit();
+        }
+
         // Approve the user
         $stmt = $pdo->prepare("UPDATE users SET is_approved = 1 WHERE id = ?");
         $stmt->execute([$user_id]);
