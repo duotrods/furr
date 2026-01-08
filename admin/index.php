@@ -735,21 +735,39 @@ $inventoryFilter = $_GET['inventory_filter'] ?? 'all';
                             </p>
                         </div>
                     </div>
-                    <div class="flex items-center space-x-2">
+                    <div class="flex flex-col items-end space-y-2">
                         <span
                             class="bg-blue-100 text-blue-800 text-xs font-medium inline-flex items-center px-2.5 py-1 rounded-md">
                             <i class="fas fa-chart-line mr-1"></i>
                             Stock Overview
                         </span>
-                        <div class="bg-white border border-gray-200 rounded-lg p-1">
-                            <button type="button" onclick="filterInventoryChart('all')" id="filter-all"
-                                class="px-3 py-1 text-sm rounded-md <?php echo $inventoryFilter === 'all' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'; ?>">
-                                All Stock
-                            </button>
-                            <button type="button" onclick="filterInventoryChart('low')" id="filter-low"
-                                class="px-3 py-1 text-sm rounded-md <?php echo $inventoryFilter === 'low' ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'; ?>">
-                                Low Stock
-                            </button>
+                        <div class="flex items-center space-x-2">
+                            <!-- Stock Level Filter -->
+                            <div class="bg-white border border-gray-200 rounded-lg p-1">
+                                <button type="button" onclick="filterInventoryChart('all', null)" id="filter-all"
+                                    class="px-3 py-1 text-sm rounded-md bg-blue-100 text-blue-700">
+                                    All Stock
+                                </button>
+                                <button type="button" onclick="filterInventoryChart('low', null)" id="filter-low"
+                                    class="px-3 py-1 text-sm rounded-md text-gray-600 hover:bg-gray-100">
+                                    Low Stock
+                                </button>
+                            </div>
+                            <!-- Category Filter -->
+                            <div class="bg-white border border-gray-200 rounded-lg p-1 flex items-center space-x-1">
+                                <button type="button" onclick="filterInventoryChart(null, 'all')" id="filter-category-all"
+                                    class="px-3 py-1 text-sm rounded-md bg-purple-100 text-purple-700">
+                                    All Categories
+                                </button>
+                                <?php foreach (getProductCategories() as $category): ?>
+                                    <button type="button" onclick="filterInventoryChart(null, <?php echo $category['id']; ?>)"
+                                        id="filter-category-<?php echo $category['id']; ?>"
+                                        class="px-3 py-1 text-sm rounded-md text-gray-600 hover:bg-gray-100"
+                                        title="<?php echo htmlspecialchars($category['name']); ?>">
+                                        <?php echo htmlspecialchars($category['name']); ?>
+                                    </button>
+                                <?php endforeach; ?>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -760,11 +778,14 @@ $inventoryFilter = $_GET['inventory_filter'] ?? 'all';
                         return [
                             'name' => $p['name'],
                             'stock' => (int)$p['stock'],
-                            'category' => getProductCategoryById($p['category_id'])['name']
+                            'category' => getProductCategoryById($p['category_id'])['name'],
+                            'category_id' => (int)$p['category_id']
                         ];
                     }, $products)); ?>;
 
                     window.currentInventoryFilter = '<?php echo $inventoryFilter; ?>';
+                    window.currentStockFilter = 'all';
+                    window.currentCategoryFilter = 'all';
                 </script>
             </div>
         </div>

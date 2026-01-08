@@ -50,6 +50,26 @@ if (isLoggedIn()) {
                 <form action="../php/auth/register-process.php" method="POST" class="space-y-6">
                     <input type="hidden" name="csrf_token" value="<?php echo generateCSRFToken(); ?>">
 
+                    <!-- Input Format Guidelines -->
+                    <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm font-semibold text-blue-800 mb-2">Input Format Guidelines:</p>
+                                <ul class="text-xs text-blue-700 space-y-1 list-disc list-inside">
+                                    <li><strong>Names:</strong> Use proper capitalization (e.g., "Juan Dela Cruz" not "JUAN DELA CRUZ")</li>
+                                    <li><strong>Email:</strong> Use lowercase letters for email addresses (e.g., "user@example.com")</li>
+                                    <li><strong>Phone:</strong> Enter 11 digits starting with 09 (e.g., "09123456789")</li>
+                                    <li><strong>Address:</strong> Use proper capitalization and complete details</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Name Fields -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-2">
@@ -58,7 +78,7 @@ if (isLoggedIn()) {
                             </label>
                             <div class="relative">
                                 <input type="text" id="first_name" pattern="[A-Za-z\s]+" name="first_name" required
-                                    placeholder="Enter your first name"
+                                    placeholder="e.g., Juan"
                                     class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white">
                                 <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                                     <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor"
@@ -68,6 +88,12 @@ if (isLoggedIn()) {
                                     </svg>
                                 </div>
                             </div>
+                            <p class="text-xs text-gray-500">
+                                <svg class="w-3 h-3 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                                </svg>
+                                Use proper capitalization (e.g., "Juan" not "JUAN")
+                            </p>
                         </div>
                         <div class="space-y-2">
                             <label for="last_name" class="block text-sm font-semibold text-gray-700">
@@ -75,9 +101,15 @@ if (isLoggedIn()) {
                             </label>
                             <div class="relative">
                                 <input type="text" id="last_name" name="last_name" required
-                                    placeholder="Enter your last name"
+                                    placeholder="e.g., Dela Cruz"
                                     class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white">
                             </div>
+                            <p class="text-xs text-gray-500">
+                                <svg class="w-3 h-3 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                                </svg>
+                                Use proper capitalization (e.g., "Dela Cruz" not "DELA CRUZ")
+                            </p>
                         </div>
                     </div>
 
@@ -89,7 +121,7 @@ if (isLoggedIn()) {
                         <div class="relative">
                             <input type="email" id="email" name="email"
                                 pattern="^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$" required
-                                placeholder="Enter your email address"
+                                placeholder="e.g., juan.delacruz@gmail.com"
                                 class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white">
                             <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                                 <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor"
@@ -101,6 +133,12 @@ if (isLoggedIn()) {
                                 </svg>
                             </div>
                         </div>
+                        <p class="text-xs text-gray-500">
+                            <svg class="w-3 h-3 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                            </svg>
+                            Use lowercase for email (e.g., "user@example.com")
+                        </p>
                     </div>
 
                     <!-- Phone Field -->
@@ -136,7 +174,7 @@ if (isLoggedIn()) {
                             Address
                         </label>
                         <div class="relative">
-                            <textarea id="address" name="address" rows="3" placeholder="Enter your complete address"
+                            <textarea id="address" name="address" rows="3" placeholder="e.g., 123 Main Street, Barangay San Juan, Manila City, Metro Manila 1000"
                                 class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white resize-none"></textarea>
                             <div class="absolute top-3 right-3 pointer-events-none">
                                 <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor"
@@ -148,6 +186,12 @@ if (isLoggedIn()) {
                                 </svg>
                             </div>
                         </div>
+                        <p class="text-xs text-gray-500">
+                            <svg class="w-3 h-3 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                            </svg>
+                            Include complete details: street, barangay, city, province, and postal code
+                        </p>
                     </div>
 
                     <!-- Password Fields -->

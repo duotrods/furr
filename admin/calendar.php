@@ -76,14 +76,13 @@
 </div>
 
 <!-- Add Closure Date Modal -->
-<!-- Add Closure Date Modal -->
-<div id="addClosureModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-50">
-  <div class="bg-white rounded-2xl shadow-2xl p-0 max-w-md w-full">
-    <div class="bg-gradient-to-r from-slate-700 to-slate-800 px-8 py-6 rounded-t-2xl">
+<div id="addClosureModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" style="display: none;">
+  <div class="bg-white rounded-2xl shadow-2xl p-0 max-w-md w-full mx-4">
+    <div class=" px-8 py-6 rounded-t-2xl">
       <div class="flex justify-between items-center">
-        <h3 class="text-2xl font-bold text-white">Add Closing Time</h3>
-        <button onclick="document.getElementById('addClosureModal').classList.add('hidden')"
-          class="text-slate-300 hover:text-white transition-colors duration-200 p-1">
+        <h3 class="text-2xl font-bold">Add Closing Time</h3>
+        <button onclick="document.getElementById('addClosureModal').style.display='none'"
+          class="text-gray-400 hover:text-gray-600 transition-colors duration-200 p-1">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
           </svg>
@@ -174,13 +173,13 @@
         </div>
 
         <div class="flex justify-end space-x-3">
-          <button type="button" onclick="document.getElementById('addClosureModal').classList.add('hidden')"
+          <button type="button" onclick="document.getElementById('addClosureModal').style.display='none'"
             class="px-4 py-2.5 bg-slate-200 text-slate-800 font-semibold rounded-lg hover:bg-slate-300 transition-colors duration-200">
             Cancel
           </button>
           <button type="submit"
             class="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-sm hover:shadow-md">
-            Add Closing Time
+            Add
           </button>
         </div>
       </form>
@@ -346,7 +345,7 @@
       },
       customButtons: {
         addClosureButton: {
-          text: 'Add',
+          text: 'Add Closing Time',
           click: function () {
             // Get the current date from the calendar
             const currentDate = calendar.view.currentStart;
@@ -367,7 +366,7 @@
             document.getElementById('endTime').value = '12:00:00';
 
             // Show the modal
-            document.getElementById('addClosureModal').classList.remove('hidden');
+            document.getElementById('addClosureModal').style.display = 'flex';
 
             // Focus on the date field
             setTimeout(() => {
@@ -693,7 +692,7 @@
             alert('Store closure added successfully!');
 
             // Hide modal and reset form
-            document.getElementById('addClosureModal').classList.add('hidden');
+            document.getElementById('addClosureModal').style.display = 'none';
             this.reset();
             document.querySelector('input[name="closureType"][value="full_day"]').checked = true;
             document.getElementById('partialClosureSection').classList.add('hidden');
@@ -710,6 +709,13 @@
           submitButton.textContent = originalText;
           submitButton.disabled = false;
         });
+    });
+
+    // Close modal when clicking outside
+    document.getElementById('addClosureModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        this.style.display = 'none';
+      }
     });
 
     // Add right-click context menu for closures

@@ -381,6 +381,30 @@ $user = getUser();
 </div>
 
 <script>
+// Phone number validation - prevent letters
+document.getElementById('phone').addEventListener('input', function(e) {
+    const errorMsg = document.getElementById('phone-error-checkout');
+    const value = e.target.value;
+
+    // Check if input contains non-numeric characters
+    if (/[^0-9]/.test(value)) {
+        // Remove non-numeric characters
+        e.target.value = value.replace(/[^0-9]/g, '');
+
+        // Show error message
+        errorMsg.classList.remove('hidden');
+        e.target.classList.add('border-red-500', 'focus:ring-red-500', 'focus:border-red-500');
+        e.target.classList.remove('border-gray-200', 'focus:ring-blue-500', 'focus:ring-blue-200');
+
+        // Hide error after 3 seconds
+        setTimeout(function() {
+            errorMsg.classList.add('hidden');
+            e.target.classList.remove('border-red-500', 'focus:ring-red-500', 'focus:border-red-500');
+            e.target.classList.add('border-gray-200', 'focus:ring-blue-500', 'focus:ring-blue-200');
+        }, 3000);
+    }
+});
+
 function showPreviewModal() {
     // Validate form first
     const form = document.getElementById('checkout-form');

@@ -193,19 +193,50 @@ document.addEventListener('DOMContentLoaded', function() {
 let inventoryChartInstance = null;
 
 // Filter function for inventory chart
-window.filterInventoryChart = function(filterType) {
-    // Update button styles
-    document.getElementById('filter-all').className = filterType === 'all'
-        ? 'px-3 py-1 text-sm rounded-md bg-blue-100 text-blue-700'
-        : 'px-3 py-1 text-sm rounded-md text-gray-600 hover:bg-gray-100';
-    document.getElementById('filter-low').className = filterType === 'low'
-        ? 'px-3 py-1 text-sm rounded-md bg-blue-100 text-blue-700'
-        : 'px-3 py-1 text-sm rounded-md text-gray-600 hover:bg-gray-100';
+window.filterInventoryChart = function(stockFilter, categoryFilter) {
+    // Update current filters
+    if (stockFilter !== null) {
+        window.currentStockFilter = stockFilter;
+    }
+    if (categoryFilter !== null) {
+        window.currentCategoryFilter = categoryFilter;
+    }
 
-    // Filter the data
+    // Update stock filter button styles
+    if (stockFilter !== null) {
+        document.getElementById('filter-all').className = window.currentStockFilter === 'all'
+            ? 'px-3 py-1 text-sm rounded-md bg-blue-100 text-blue-700'
+            : 'px-3 py-1 text-sm rounded-md text-gray-600 hover:bg-gray-100';
+        document.getElementById('filter-low').className = window.currentStockFilter === 'low'
+            ? 'px-3 py-1 text-sm rounded-md bg-blue-100 text-blue-700'
+            : 'px-3 py-1 text-sm rounded-md text-gray-600 hover:bg-gray-100';
+    }
+
+    // Update category filter button styles
+    if (categoryFilter !== null) {
+        // Reset all category buttons
+        document.querySelectorAll('[id^="filter-category-"]').forEach(btn => {
+            btn.className = 'px-3 py-1 text-sm rounded-md text-gray-600 hover:bg-gray-100';
+        });
+
+        // Highlight active category button
+        const activeBtn = document.getElementById('filter-category-' + window.currentCategoryFilter);
+        if (activeBtn) {
+            activeBtn.className = 'px-3 py-1 text-sm rounded-md bg-purple-100 text-purple-700';
+        }
+    }
+
+    // Filter the data based on both filters
     let filteredProducts = window.allProductsData;
-    if (filterType === 'low') {
-        filteredProducts = window.allProductsData.filter(p => p.stock > 0 && p.stock < 10);
+
+    // Apply stock level filter
+    if (window.currentStockFilter === 'low') {
+        filteredProducts = filteredProducts.filter(p => p.stock > 0 && p.stock < 10);
+    }
+
+    // Apply category filter
+    if (window.currentCategoryFilter !== 'all') {
+        filteredProducts = filteredProducts.filter(p => p.category_id === parseInt(window.currentCategoryFilter));
     }
 
     // Update total stock display
