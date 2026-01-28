@@ -57,7 +57,8 @@ if (!$product) {
 // Handle image upload if provided
 $image = $product['image'];
 if (!empty($_FILES['image']['name'])) {
-    $new_image = uploadProductImage($_FILES['image']);
+    $upload_error = null;
+    $new_image = uploadProductImage($_FILES['image'], $upload_error);
     if ($new_image) {
         // Delete old image if it exists
         if ($image) {

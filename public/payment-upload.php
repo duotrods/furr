@@ -19,6 +19,19 @@ if (!$order || $order['user_id'] != getUserId()) {
     exit();
 }
 
+// Get order items for preview
+$stmt = $pdo->prepare("
+    SELECT oi.*, p.name, p.image, p.price
+    FROM order_items oi
+    JOIN products p ON oi.product_id = p.id
+    WHERE oi.order_id = ?
+");
+$stmt->execute([$order_id]);
+$order_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Get user info
+$user = getUser();
+
 if (isset($_SESSION['cart'])) {
     unset($_SESSION['cart']); // Clear the cart items
     $_SESSION['cart_count'] = 0; // Reset cart count
@@ -283,13 +296,15 @@ if (isset($_SESSION['cart'])) {
                                     </div>
                                 </div>
 
-                                <button type="submit"
+                                <button type="button" onclick="showReviewModal()"
                                     class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-4 px-6 rounded-lg transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg flex items-center justify-center">
                                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                                     </svg>
-                                    Submit Payment Verification
+                                    Review Order
                                 </button>
                             </form>
                         </div>
@@ -297,6 +312,140 @@ if (isset($_SESSION['cart'])) {
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- Order Review Modal -->
+<div id="reviewModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 overflow-y-auto" style="display: none;">
+    <div class="flex items-start justify-center min-h-full px-4 py-8">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full mx-auto">
+        <div class="bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-6 rounded-t-2xl">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h3 class="text-2xl font-bold text-white">Order Confirmation</h3>
+                    <p class="text-blue-100 mt-1">Please review your order details before confirming</p>
+                </div>
+                <button onclick="hideReviewModal()" type="button" class="text-white hover:text-gray-200 transition-colors duration-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="p-8 space-y-6">
+            <!-- Personal Information -->
+            <div class="border-2 border-gray-200 rounded-xl p-6 bg-gray-50">
+                <h4 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                    Personal Information
+                </h4>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-sm text-gray-600">Name</p>
+                        <p class="font-semibold text-gray-900"><?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?></p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Email</p>
+                        <p class="font-semibold text-gray-900"><?= htmlspecialchars($user['email']) ?></p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Phone</p>
+                        <p class="font-semibold text-gray-900"><?= htmlspecialchars($order['contact_number'] ?? $user['phone']) ?></p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Payment Method</p>
+                        <p class="font-semibold text-gray-900"><?= ucfirst($order['payment_method']) ?></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shipping Address -->
+            <div class="border-2 border-gray-200 rounded-xl p-6 bg-gray-50">
+                <h4 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    Shipping Address
+                </h4>
+                <p class="text-gray-900"><?= htmlspecialchars($order['shipping_address']) ?></p>
+            </div>
+
+            <!-- Order Items -->
+            <div class="border-2 border-gray-200 rounded-xl p-6 bg-gray-50">
+                <h4 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                    </svg>
+                    Order Items
+                </h4>
+                <div class="space-y-3">
+                    <?php foreach ($order_items as $item): ?>
+                        <div class="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200">
+                            <div class="flex items-center space-x-3">
+                                <img src="../assets/uploads/<?= htmlspecialchars($item['image'] ?: 'default-product.svg') ?>"
+                                    alt="<?= htmlspecialchars($item['name']) ?>"
+                                    class="w-12 h-12 object-cover rounded-md"
+                                    onerror="this.onerror=null; this.src='../assets/uploads/default-product.svg';">
+                                <div>
+                                    <p class="font-semibold text-gray-900"><?= htmlspecialchars($item['name']) ?></p>
+                                    <p class="text-sm text-gray-600">Quantity: <?= $item['quantity'] ?></p>
+                                </div>
+                            </div>
+                            <p class="font-bold text-gray-900">₱<?= number_format($item['price'] * $item['quantity'], 2) ?></p>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+
+            <!-- Payment Details -->
+            <div class="border-2 border-blue-200 rounded-xl p-6 bg-blue-50">
+                <h4 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                    </svg>
+                    Payment Details
+                </h4>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-sm text-gray-600">Reference Number</p>
+                        <p id="preview-reference" class="font-semibold text-gray-900 font-mono"></p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Payment Proof</p>
+                        <p id="preview-file" class="font-semibold text-gray-900"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Amount -->
+            <div class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border-2 border-green-200">
+                <div class="flex justify-between items-center">
+                    <span class="text-xl font-bold text-gray-900">Total Amount</span>
+                    <span class="text-3xl font-bold text-green-600">₱<?= number_format($order['total_amount'], 2) ?></span>
+                </div>
+                <p class="text-sm text-gray-600 mt-1">Including all applicable taxes</p>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex space-x-4 pt-4">
+                <button type="button" onclick="hideReviewModal()"
+                    class="flex-1 px-6 py-3 bg-gray-200 text-gray-800 font-semibold rounded-xl hover:bg-gray-300 transition-colors duration-200">
+                    Edit Order
+                </button>
+                <button type="button" onclick="confirmAndSubmit()"
+                    class="flex-1 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center space-x-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span>Confirm & Place Order</span>
+                </button>
+            </div>
+        </div>
+    </div>
     </div>
 </div>
 
@@ -308,6 +457,49 @@ if (isset($_SESSION['cart'])) {
             placeholder.style.display = 'none';
         } else {
             placeholder.style.display = 'flex';
+        }
+    });
+
+    function showReviewModal() {
+        // Validate that payment proof and reference are filled
+        var fileInput = document.getElementById('payment_proof');
+        var refInput = document.getElementById('reference_number');
+
+        if (!fileInput.files.length) {
+            alert('Please upload your payment screenshot first.');
+            fileInput.focus();
+            return;
+        }
+
+        if (!refInput.value.trim()) {
+            alert('Please enter your GCash reference number.');
+            refInput.focus();
+            return;
+        }
+
+        // Populate payment details in modal
+        document.getElementById('preview-reference').textContent = refInput.value;
+        document.getElementById('preview-file').textContent = fileInput.files[0].name;
+
+        // Show modal
+        document.getElementById('reviewModal').style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function hideReviewModal() {
+        document.getElementById('reviewModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+
+    function confirmAndSubmit() {
+        // Find and submit the payment form
+        document.querySelector('form[action="../php/products/process-payment.php"]').submit();
+    }
+
+    // Close modal when clicking outside the white card
+    document.getElementById('reviewModal').addEventListener('click', function(e) {
+        if (e.target === this || e.target.classList.contains('flex')) {
+            hideReviewModal();
         }
     });
 </script>

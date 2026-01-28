@@ -204,8 +204,7 @@ if (isLoggedIn()) {
                                 <input type="password" id="password" name="password" required
                                     placeholder="Create a strong password"
                                     class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white pr-12">
-                                <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center"
-                                    onclick="togglePassword('password')">
+                                <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center">
                                     <svg xmlns="http://www.w3.org/2000/svg"
                                         class="h-5 w-5 text-gray-400 hover:text-gray-600 transition-colors" fill="none"
                                         viewBox="0 0 24 24" stroke="currentColor">
@@ -225,8 +224,7 @@ if (isLoggedIn()) {
                                 <input type="password" id="confirm_password" name="confirm_password" required
                                     placeholder="Confirm your password"
                                     class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white pr-12">
-                                <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center"
-                                    onclick="togglePassword('confirm_password')">
+                                <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center">
                                     <svg xmlns="http://www.w3.org/2000/svg"
                                         class="h-5 w-5 text-gray-400 hover:text-gray-600 transition-colors" fill="none"
                                         viewBox="0 0 24 24" stroke="currentColor">
@@ -324,15 +322,6 @@ document.getElementById('phone').addEventListener('input', function(e) {
     }
 });
 
-// Password toggle function
-function togglePassword(fieldId) {
-    const field = document.getElementById(fieldId);
-    if (field.type === 'password') {
-        field.type = 'text';
-    } else {
-        field.type = 'password';
-    }
-}
 </script>
 
 <?php require_once '../includes/footer.php'; ?>

@@ -314,20 +314,33 @@ function getAppointmentCounts()
 }
 
 // Upload product image
-function uploadProductImage($file)
+function uploadProductImage($file, &$error = null)
 {
-    $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
-    $max_size = 2 * 1024 * 1024; // 2MB
+    $allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    $max_size = 10 * 1024 * 1024; // 10MB
+
+    if ($file['error'] !== UPLOAD_ERR_OK) {
+        $error = 'File upload error. Please try again.';
+        return false;
+    }
 
     if (!in_array($file['type'], $allowed_types)) {
+        $error = 'Invalid image format. Please upload JPG, PNG, GIF, or WEBP.';
         return false;
     }
 
     if ($file['size'] > $max_size) {
+        $error = 'Image is too large. Maximum size is 10MB.';
         return false;
     }
 
-    $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
+    $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+    $allowed_ext = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+    if (!in_array($ext, $allowed_ext)) {
+        $error = 'Invalid file extension. Allowed: JPG, PNG, GIF, WEBP.';
+        return false;
+    }
+
     $filename = uniqid() . '.' . $ext;
     $destination = __DIR__ . '/../assets/uploads/' . $filename;
 
@@ -335,6 +348,7 @@ function uploadProductImage($file)
         return $filename;
     }
 
+    $error = 'Failed to save the image. Please try again.';
     return false;
 }
 

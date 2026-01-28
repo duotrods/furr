@@ -141,12 +141,12 @@
 
                         <!-- Image Upload -->
                         <div class="space-y-2">
-                            <label for="image" class="block text-sm font-semibold text-slate-700">
+                            <span class="block text-sm font-semibold text-slate-700">
                                 Product Image
-                            </label>
-                            <div
-                                class="border-2 border-dashed border-slate-300 rounded-lg p-6 hover:border-blue-400 transition-colors duration-200">
-                                <div class="text-center">
+                            </span>
+                            <label for="image"
+                                class="block border-2 border-dashed border-slate-300 rounded-lg p-6 hover:border-blue-400 transition-colors duration-200 cursor-pointer">
+                                <div id="upload-placeholder" class="text-center">
                                     <svg class="mx-auto h-12 w-12 text-slate-400" stroke="currentColor" fill="none"
                                         viewBox="0 0 48 48">
                                         <path
@@ -154,24 +154,33 @@
                                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                     </svg>
                                     <div class="mt-4">
-                                        <label for="image" class="cursor-pointer">
-                                            <span
-                                                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 transition-colors duration-200">
-                                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                                                </svg>
-                                                Upload Image
-                                            </span>
-                                            <input type="file" id="image" name="image" accept="image/*" class="sr-only">
-                                        </label>
+                                        <span
+                                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 transition-colors duration-200">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    stroke-width="2"
+                                                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                            </svg>
+                                            Upload Image
+                                        </span>
                                     </div>
-                                    <p class="mt-2 text-xs text-slate-500">PNG, JPG, GIF up to 10MB</p>
+                                    <p class="mt-2 text-xs text-slate-500">PNG, JPG, GIF, WEBP up to 10MB</p>
                                     <p class="text-xs text-slate-500">Recommended size: 500x500 pixels</p>
                                 </div>
-                            </div>
+                                <div id="image-preview" class="text-center hidden">
+                                    <img id="preview-img" src="" alt="Preview" class="mx-auto h-32 w-32 object-cover rounded-lg mb-3">
+                                    <p id="file-name" class="text-sm font-medium text-slate-700"></p>
+                                    <p id="file-size" class="text-xs text-slate-500"></p>
+                                    <span class="inline-flex items-center mt-2 px-3 py-1 text-xs font-medium text-green-700 bg-green-100 rounded-full">
+                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                        Image attached — click to change
+                                    </span>
+                                </div>
+                                <input type="file" id="image" name="image" accept="image/jpeg,image/png,image/gif,image/webp" class="sr-only">
+                            </label>
                         </div>
 
                         <!-- Submit Button -->
@@ -198,5 +207,34 @@
         </div>
     </div>
 </div>
+
+<script>
+document.getElementById('image').addEventListener('change', function(e) {
+    var placeholder = document.getElementById('upload-placeholder');
+    var preview = document.getElementById('image-preview');
+    var previewImg = document.getElementById('preview-img');
+    var fileName = document.getElementById('file-name');
+    var fileSize = document.getElementById('file-size');
+
+    if (e.target.files.length > 0) {
+        var file = e.target.files[0];
+        var reader = new FileReader();
+        reader.onload = function(ev) {
+            previewImg.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+
+        fileName.textContent = file.name;
+        var sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+        fileSize.textContent = sizeMB + ' MB';
+
+        placeholder.classList.add('hidden');
+        preview.classList.remove('hidden');
+    } else {
+        placeholder.classList.remove('hidden');
+        preview.classList.add('hidden');
+    }
+});
+</script>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>

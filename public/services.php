@@ -31,7 +31,7 @@
                                 <div>
                                     <h3 class="text-2xl font-bold mb-2"><?php echo htmlspecialchars($service['name']); ?>
                                     </h3>
-                                    <p class="text-sm font-bold mb-2"><?php echo htmlspecialchars($service['size']); ?>
+                                    <p class="text-sm font-bold mb-2"><?php echo htmlspecialchars($service['size']); ?> 
                                     </p>
                                     <div style="background: linear-gradient(45deg, #10b981, #059669); "
                                         class="inline-block px-3 py-1 rounded-full text-sm font-semibold">

@@ -61,9 +61,10 @@ if (!empty($errors)) {
 // Handle image upload
 $image = null;
 if (!empty($_FILES['image']['name'])) {
-    $image = uploadProductImage($_FILES['image']);
+    $upload_error = null;
+    $image = uploadProductImage($_FILES['image'], $upload_error);
     if (!$image) {
-        $_SESSION['error_message'] = 'Failed to upload product image.';
+        $_SESSION['error_message'] = $upload_error ?? 'Failed to upload product image.';
         header('Location: ' . BASE_URL . '/admin/add-product.php');
         exit();
     }

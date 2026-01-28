@@ -54,13 +54,22 @@ $order_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 $back_url = $back_page == 'payment-review' ? 'payment-review.php' : 'orders.php';
                 $back_text = $back_page == 'payment-review' ? 'Back to Payment Review' : 'Back to Orders';
                 ?>
-                <a href="<?= $back_url ?>"
-                   class="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200 font-medium">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                    </svg>
-                    <?= $back_text ?>
-                </a>
+                <div class="flex items-center gap-3">
+                    <button onclick="printReceipt()"
+                       class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors duration-200 font-medium shadow-sm">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                        </svg>
+                        Print Receipt
+                    </button>
+                    <a href="<?= $back_url ?>"
+                       class="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors duration-200 font-medium">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                        </svg>
+                        <?= $back_text ?>
+                    </a>
+                </div>
             </div>
         </div>
 
@@ -76,7 +85,7 @@ $order_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
         <?php endif; ?>
 
-        <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 xl:grid-cols-5 gap-8">
             <!-- Order & Customer Information -->
             <div class="xl:col-span-2 space-y-8">
                 <!-- Order Details Card -->
@@ -207,7 +216,7 @@ $order_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
             
             <!-- Order Items & Actions -->
-            <div class="space-y-8">
+            <div class="xl:col-span-3  space-y-8">
                 <!-- Order Items Card -->
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                     <div class="border-b border-gray-200 px-6 py-4 bg-gray-50">
@@ -315,5 +324,116 @@ $order_items = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </div>
 </div>
+
+<!-- Hidden Receipt Template for Print -->
+<div id="receipt-print" style="display: none;">
+    <div style="font-family: 'Courier New', Courier, monospace; max-width: 350px; margin: 0 auto; padding: 20px; font-size: 13px; color: #000;">
+        <!-- Header -->
+        <div style="text-align: center; border-bottom: 2px dashed #000; padding-bottom: 15px; margin-bottom: 15px;">
+            <h1 style="font-size: 20px; font-weight: bold; margin: 0 0 5px 0;">FurCare Pet Grooming</h1>
+            <p style="margin: 2px 0; font-size: 11px;">Mabitad Sto. Nino, Panabo City</p>
+            <p style="margin: 2px 0; font-size: 11px;">Davao del Norte</p>
+            <p style="margin: 2px 0; font-size: 11px;">Tel: +639700249877</p>
+        </div>
+
+        <!-- Order Info -->
+        <div style="border-bottom: 1px dashed #000; padding-bottom: 10px; margin-bottom: 10px;">
+            <p style="margin: 3px 0;"><strong>ORDER #<?= str_pad($order_id, 5, '0', STR_PAD_LEFT) ?></strong></p>
+            <p style="margin: 3px 0;">Date: <?= date('M j, Y g:i A', strtotime($order['order_date'])) ?></p>
+            <p style="margin: 3px 0;">Status: <?= ucwords(str_replace('_', ' ', $order['status'])) ?></p>
+        </div>
+
+        <!-- Customer Info -->
+        <div style="border-bottom: 1px dashed #000; padding-bottom: 10px; margin-bottom: 10px;">
+            <p style="margin: 3px 0;"><strong>Customer:</strong></p>
+            <p style="margin: 3px 0;"><?= htmlspecialchars($order['first_name'] . ' ' . $order['last_name']) ?></p>
+            <p style="margin: 3px 0;"><?= htmlspecialchars($order['email']) ?></p>
+            <p style="margin: 3px 0;"><?= htmlspecialchars($order['phone']) ?></p>
+            <p style="margin: 3px 0; font-size: 11px;"><?= htmlspecialchars($order['shipping_address']) ?></p>
+        </div>
+
+        <!-- Items Header -->
+        <div style="border-bottom: 1px solid #000; padding-bottom: 5px; margin-bottom: 5px;">
+            <table style="width: 100%; font-size: 12px;">
+                <tr>
+                    <td style="text-align: left; font-weight: bold;">Item</td>
+                    <td style="text-align: center; font-weight: bold;">Qty</td>
+                    <td style="text-align: right; font-weight: bold;">Price</td>
+                    <td style="text-align: right; font-weight: bold;">Total</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Items -->
+        <div style="border-bottom: 2px dashed #000; padding-bottom: 10px; margin-bottom: 10px;">
+            <table style="width: 100%; font-size: 12px;">
+                <?php foreach ($order_items as $item): ?>
+                <tr>
+                    <td style="text-align: left; padding: 4px 0; max-width: 120px; word-wrap: break-word;"><?= htmlspecialchars($item['name']) ?></td>
+                    <td style="text-align: center; padding: 4px 0;"><?= $item['quantity'] ?></td>
+                    <td style="text-align: right; padding: 4px 0;"><?= number_format($item['price'], 2) ?></td>
+                    <td style="text-align: right; padding: 4px 0;"><?= number_format($item['price'] * $item['quantity'], 2) ?></td>
+                </tr>
+                <?php endforeach; ?>
+            </table>
+        </div>
+
+        <!-- Total -->
+        <div style="border-bottom: 2px dashed #000; padding-bottom: 10px; margin-bottom: 10px;">
+            <table style="width: 100%; font-size: 13px;">
+                <tr>
+                    <td style="text-align: left;"><strong>TOTAL</strong></td>
+                    <td style="text-align: right; font-size: 16px;"><strong>P <?= number_format($order['total_amount'], 2) ?></strong></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Payment Info -->
+        <div style="border-bottom: 1px dashed #000; padding-bottom: 10px; margin-bottom: 10px;">
+            <p style="margin: 3px 0;">Payment: <?= ucfirst($order['payment_method']) ?></p>
+            <?php if ($order['payment_reference']): ?>
+            <p style="margin: 3px 0;">Ref #: <?= htmlspecialchars($order['payment_reference']) ?></p>
+            <?php endif; ?>
+        </div>
+
+        <!-- Footer -->
+        <div style="text-align: center; margin-top: 15px;">
+            <p style="margin: 3px 0; font-size: 12px;">Thank you for your purchase!</p>
+            <p style="margin: 3px 0; font-size: 11px;">FurCare Pet Grooming</p>
+            <p style="margin: 10px 0 0 0; font-size: 10px; color: #666;">Printed: <?= date('M j, Y g:i A') ?></p>
+        </div>
+    </div>
+</div>
+
+<script>
+function printReceipt() {
+    var receiptContent = document.getElementById('receipt-print').innerHTML;
+    var printWindow = window.open('', '_blank', 'width=400,height=600');
+    printWindow.document.write(`
+        <html>
+        <head>
+            <title>Receipt - Order #<?= str_pad($order_id, 5, '0', STR_PAD_LEFT) ?></title>
+            <style>
+                @media print {
+                    body { margin: 0; padding: 0; }
+                    @page { size: 80mm auto; margin: 5mm; }
+                }
+                body { margin: 0; padding: 0; background: #fff; }
+            </style>
+        </head>
+        <body>
+            ${receiptContent}
+            <script>
+                window.onload = function() {
+                    window.print();
+                    window.onafterprint = function() { window.close(); };
+                };
+            <\/script>
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+}
+</script>
 
 <?php include __DIR__ . '/../includes/footer.php'; ?>

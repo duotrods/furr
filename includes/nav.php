@@ -82,8 +82,26 @@ $current_page = basename($_SERVER['PHP_SELF']);
                             Orders
                         </a>
                         <a href="../admin/products.php"
-                            class="text-sm font-medium <?= ($current_page == 'products.php') ? 'text-blue-600 border-b-2 border-blue-600 pb-4' : 'text-gray-700' ?> hover:text-blue-600 transition duration-300 py-4">
+                            class="text-sm font-medium <?= ($current_page == 'products.php') ? 'text-blue-600 border-b-2 border-blue-600 pb-4' : 'text-gray-700' ?> hover:text-blue-600 transition duration-300 py-4 relative">
                             Products
+                            <?php
+                            $stmt = $pdo->prepare("
+                                SELECT COUNT(*) as near_expiry_count
+                                FROM products
+                                WHERE expiry IS NOT NULL
+                                AND expiry >= CURRENT_DATE
+                                AND expiry <= DATE_ADD(CURRENT_DATE, INTERVAL 7 DAY)
+                            ");
+                            $stmt->execute();
+                            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                            $near_expiry_count = $result['near_expiry_count'] ?? 0;
+
+                            if ($near_expiry_count > 0): ?>
+                                <span
+                                    class="absolute -top-1 -right-2 bg-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium transform translate-x-1/2 -translate-y-1/4">
+                                    <?= $near_expiry_count ?>
+                                </span>
+                            <?php endif; ?>
                         </a>
                         <a href="../admin/reports.php"
                             class="text-sm font-medium <?= ($current_page == 'reports.php') ? 'text-blue-600 border-b-2 border-blue-600 pb-4' : 'text-gray-700' ?> hover:text-blue-600 transition duration-300 py-4">

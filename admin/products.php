@@ -41,6 +41,18 @@ $stmt->execute($params);
 $products = $stmt->fetchAll();
 
 $categories = getProductCategories();
+
+// Get nearly expired products (within 7 days) for notification
+$nearExpiryStmt = $pdo->prepare("
+    SELECT name, expiry, DATEDIFF(expiry, CURRENT_DATE) AS days_left
+    FROM products
+    WHERE expiry IS NOT NULL
+    AND expiry >= CURRENT_DATE
+    AND expiry <= DATE_ADD(CURRENT_DATE, INTERVAL 7 DAY)
+    ORDER BY expiry ASC
+");
+$nearExpiryStmt->execute();
+$nearExpiryProducts = $nearExpiryStmt->fetchAll();
 ?>
 
 <style>
@@ -108,6 +120,40 @@ $categories = getProductCategories();
     </div>
 
     <div class="container mx-auto px-6 py-8">
+        <!-- Expiry Notifications -->
+        <?php if (!empty($nearExpiryProducts)): ?>
+        <div class="mb-6 bg-yellow-50 border-l-4 border-yellow-400 rounded-r-xl p-5 shadow-sm">
+            <div class="flex items-start">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-triangle text-yellow-500 text-xl mt-0.5"></i>
+                </div>
+                <div class="ml-4 flex-1">
+                    <h3 class="text-sm font-bold text-yellow-800 mb-2">
+                        <i class="fas fa-clock mr-1"></i>
+                        <?= count($nearExpiryProducts) ?> Product<?= count($nearExpiryProducts) > 1 ? 's' : '' ?> Nearly Expired
+                    </h3>
+                    <div class="space-y-1">
+                        <?php foreach ($nearExpiryProducts as $ep): ?>
+                        <p class="text-sm text-yellow-700">
+                            <span class="font-semibold"><?= htmlspecialchars($ep['name']) ?></span>
+                            — expires on <span class="font-semibold"><?= date('M j, Y', strtotime($ep['expiry'])) ?></span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold ml-1 <?= $ep['days_left'] <= 2 ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700' ?>">
+                                <?= $ep['days_left'] == 0 ? 'Today!' : $ep['days_left'] . ' day' . ($ep['days_left'] > 1 ? 's' : '') . ' left' ?>
+                            </span>
+                        </p>
+                        <?php endforeach; ?>
+                    </div>
+                    <a href="products.php?filter=near_expiry&expiry_days=7" class="inline-block mt-2 text-sm font-semibold text-yellow-800 hover:text-yellow-900 underline">
+                        View all near-expiry products &rarr;
+                    </a>
+                </div>
+                <button onclick="this.closest('.mb-6').style.display='none'" class="flex-shrink-0 ml-4 text-yellow-400 hover:text-yellow-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        <?php endif; ?>
+
         <!-- Stats Overview -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div class="stats-card rounded-xl p-6 text-center shadow-sm">
