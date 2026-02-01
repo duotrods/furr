@@ -179,15 +179,15 @@ $nearExpiryProducts = $nearExpiryStmt->fetchAll();
         <!-- Main Content Card -->
         <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
             <!-- Category Filters -->
-            <div class="bg-gradient-to-r from-gray-50 to-white p-6 border-b border-gray-200">
+            <div id="filters" class="bg-gradient-to-r from-gray-50 to-white p-6 border-b border-gray-200">
                 <h3 class="text-lg font-semibold text-gray-800 mb-4">Filter by Category</h3>
                 <div class="flex flex-wrap gap-3">
-                    <a href="products.php?filter=<?php echo $filter; ?>"
+                    <a href="products.php?filter=<?php echo $filter; ?>#filters"
                         class="category-filter px-6 py-3 rounded-full font-medium shadow-sm <?php echo !$category_id ? 'bg-blue-600 text-white shadow-blue-200' : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'; ?>">
                         <i class="fas fa-th-large mr-2"></i>All Products
                     </a>
                     <?php foreach ($categories as $category): ?>
-                        <a href="products.php?category_id=<?php echo $category['id']; ?>&filter=<?php echo $filter; ?>"
+                        <a href="products.php?category_id=<?php echo $category['id']; ?>&filter=<?php echo $filter; ?>#filters"
                             class="category-filter px-6 py-3 rounded-full font-medium shadow-sm <?php echo $category_id == $category['id'] ? 'bg-blue-600 text-white shadow-blue-200' : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'; ?>">
                             <i class="fas fa-tag mr-2"></i><?php echo $category['name']; ?>
                         </a>
@@ -203,27 +203,27 @@ $nearExpiryProducts = $nearExpiryStmt->fetchAll();
                     </h3>
                 </div>
                 <div class="flex flex-wrap gap-3">
-                    <a href="products.php?<?php echo $category_id ? 'category_id=' . $category_id . '&' : ''; ?>filter=all"
+                    <a href="products.php?<?php echo $category_id ? 'category_id=' . $category_id . '&' : ''; ?>filter=all#filters"
                         class="category-filter px-4 py-2 rounded-lg text-sm font-medium shadow-sm <?php echo $filter == 'all' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'; ?>">
                         <i class="fas fa-list mr-1"></i>All
                     </a>
-                    <a href="products.php?<?php echo $category_id ? 'category_id=' . $category_id . '&' : ''; ?>filter=near_expiry&expiry_days=7"
+                    <a href="products.php?<?php echo $category_id ? 'category_id=' . $category_id . '&' : ''; ?>filter=near_expiry&expiry_days=7#filters"
                         class="category-filter px-4 py-2 rounded-lg text-sm font-medium shadow-sm <?php echo $filter == 'near_expiry' ? 'bg-yellow-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'; ?>">
                         <i class="fas fa-exclamation-triangle mr-1"></i>Near Expiry (<?php echo $expiry_days; ?> days)
                     </a>
-                    <a href="products.php?<?php echo $category_id ? 'category_id=' . $category_id . '&' : ''; ?>filter=expired"
+                    <a href="products.php?<?php echo $category_id ? 'category_id=' . $category_id . '&' : ''; ?>filter=expired#filters"
                         class="category-filter px-4 py-2 rounded-lg text-sm font-medium shadow-sm <?php echo $filter == 'expired' ? 'bg-red-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'; ?>">
                         <i class="fas fa-times-circle mr-1"></i>Expired
                     </a>
-                    <a href="products.php?<?php echo $category_id ? 'category_id=' . $category_id . '&' : ''; ?>filter=in_stock"
+                    <a href="products.php?<?php echo $category_id ? 'category_id=' . $category_id . '&' : ''; ?>filter=in_stock#filters"
                         class="category-filter px-4 py-2 rounded-lg text-sm font-medium shadow-sm <?php echo $filter == 'in_stock' ? 'bg-green-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'; ?>">
                         <i class="fas fa-check-circle mr-1"></i>In Stock
                     </a>
-                    <a href="products.php?<?php echo $category_id ? 'category_id=' . $category_id . '&' : ''; ?>filter=low_stock"
+                    <a href="products.php?<?php echo $category_id ? 'category_id=' . $category_id . '&' : ''; ?>filter=low_stock#filters"
                         class="category-filter px-4 py-2 rounded-lg text-sm font-medium shadow-sm <?php echo $filter == 'low_stock' ? 'bg-yellow-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'; ?>">
                         <i class="fas fa-exclamation-circle mr-1"></i>Low Stock
                     </a>
-                    <a href="products.php?<?php echo $category_id ? 'category_id=' . $category_id . '&' : ''; ?>filter=out_of_stock"
+                    <a href="products.php?<?php echo $category_id ? 'category_id=' . $category_id . '&' : ''; ?>filter=out_of_stock#filters"
                         class="category-filter px-4 py-2 rounded-lg text-sm font-medium shadow-sm <?php echo $filter == 'out_of_stock' ? 'bg-gray-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'; ?>">
                         <i class="fas fa-ban mr-1"></i>Out of Stock
                     </a>
@@ -231,7 +231,7 @@ $nearExpiryProducts = $nearExpiryStmt->fetchAll();
                 <?php if ($filter == 'near_expiry'): ?>
                     <div class="mt-3">
                         <label for="expiry_days_select" class="text-sm text-gray-600 mr-2">Show products expiring within:</label>
-                        <select id="expiry_days_select" onchange="window.location.href='products.php?<?php echo $category_id ? 'category_id=' . $category_id . '&' : ''; ?>filter=near_expiry&expiry_days='+this.value" class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm">
+                        <select id="expiry_days_select" onchange="window.location.href='products.php?<?php echo $category_id ? 'category_id=' . $category_id . '&' : ''; ?>filter=near_expiry&expiry_days='+this.value+'#filters'" class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm">
                             <option value="3" <?php echo $expiry_days == 3 ? 'selected' : ''; ?>>3 days</option>
                             <option value="7" <?php echo $expiry_days == 7 ? 'selected' : ''; ?>>7 days</option>
                             <option value="14" <?php echo $expiry_days == 14 ? 'selected' : ''; ?>>14 days</option>

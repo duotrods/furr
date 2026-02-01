@@ -1,5 +1,4 @@
 <?php
-header('Content-Type: text/html; charset=UTF-8');
 require_once '../../includes/config.php';
 require_once '../../vendor/autoload.php'; // adjust if your autoload path differs
 requireAdmin();
@@ -27,196 +26,138 @@ $css = "
         padding: 20px;
         color: #333;
         background-color: #fff;
-        line-height: 1.6;
+        line-height: 1.4;
+        font-size: 11px;
+    }
+
+    /* Top Header Row */
+    .top-header {
+        display: table;
+        width: 100%;
+        margin-bottom: 10px;
+        font-size: 10px;
+        color: #666;
+    }
+
+    .top-header-left {
+        display: table-cell;
+        text-align: left;
+    }
+
+    .top-header-right {
+        display: table-cell;
+        text-align: right;
+        color: #2c5aa0;
+        font-weight: 600;
     }
 
     /* Header Layout - Centered Structure */
     .header {
         margin-bottom: 15px;
-        padding-bottom: 20px;
-        border-bottom: 3px solid #2c5aa0;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #2c5aa0;
         text-align: center;
     }
-    
-    .logo-container {
-        width: 80px;
-        height: 80px;
-        margin: 0 auto 15px;
-    }
-    
-    .logo {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-    }
-    
-    .logo-fallback {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 80px;
-        height: 80px;
-        margin: 0 auto;
-        background-color: #2c5aa0;
-        color: white;
-        font-weight: bold;
-        border-radius: 50%;
-        font-size: 24px;
-    }
-    
-    .contact-info {
-        font-size: 12px;
-        color: #555;
-        line-height: 1.4;
-        margin: 0 auto 15px;
-        max-width: 300px;
-    }
-    
+
     .company-name {
         font-size: 28px;
         font-weight: bold;
         color: #2c5aa0;
-        margin: 0;
-        letter-spacing: 1px;
+        margin: 10px 0 5px 0;
+        letter-spacing: 2px;
+    }
+
+    .contact-info {
+        font-size: 11px;
+        color: #555;
+        line-height: 1.4;
+        margin: 0 auto 10px;
     }
 
     /* Report Title Section */
     .report-title {
-        font-size: 22px;
-        color: #444;
-        margin: 20px 0 5px 0;
+        font-size: 18px;
+        color: #333;
+        margin: 15px 0 5px 0;
         font-weight: 600;
         text-align: center;
     }
 
     .date-range {
-        font-size: 14px;
+        font-size: 12px;
         color: #666;
-        margin: 5px 0 0 0;
+        margin: 5px 0 15px 0;
         font-style: italic;
         text-align: center;
     }
 
-    /* Report Meta Information */
-    .report-meta {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 25px;
-        padding: 15px;
-        background-color: #f8f9fa;
-        border-radius: 8px;
-        border-left: 4px solid #2c5aa0;
+    /* Summary Box */
+    .summary-box {
+        border: 1px solid #333;
+        padding: 10px 15px;
+        margin-bottom: 15px;
     }
 
-    .meta-item {
+    .summary-title {
         font-size: 12px;
-        color: #555;
-    }
-
-    .meta-label {
         font-weight: bold;
-        color: #2c5aa0;
+        margin-bottom: 8px;
     }
 
-    /* Table Styling */
+    .summary-content {
+        display: table;
+        width: 100%;
+    }
+
+    .summary-item {
+        display: table-cell;
+        font-size: 11px;
+    }
+
+    /* Table Styling with Visible Borders */
     table {
         width: 100%;
         border-collapse: collapse;
-        margin-top: 20px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        border-radius: 8px;
-        overflow: hidden;
+        margin-top: 10px;
+        border: 1px solid #333;
     }
 
     th {
-        background-color: #2c5aa0 !important;
-        color: white !important;
-        padding: 15px 10px;
-        text-align: center;
-        font-weight: 600;
-        font-size: 11px;
+        background-color: #e8e8e8 !important;
+        color: #333 !important;
+        padding: 10px 8px;
+        text-align: left;
+        font-weight: bold;
+        font-size: 10px;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
-        border: none;
+        border: 1px solid #333;
     }
 
     td {
-        padding: 12px 10px;
-        border-bottom: 1px solid #e9ecef;
+        padding: 8px;
+        border: 1px solid #333;
         font-size: 11px;
         vertical-align: top;
     }
 
-    tr:nth-child(even) {
-        background-color: #f8f9fa;
-    }
-
-    tr:hover {
-        background-color: #e3f2fd;
-    }
-
     /* Special Cell Styles */
     .amount {
-        font-weight: 600;
-        color: #2c5aa0;
-        text-align: right;
+        font-weight: bold;
+        text-align: left;
     }
 
-    .status {
-        padding: 4px 8px;
-        border-radius: 12px;
-        font-size: 10px;
-        font-weight: 600;
-        text-transform: uppercase;
-        text-align: center;
-    }
-
-    .status-confirmed {
-        background-color: #d4edda;
-        color: #155724;
-    }
-
-    .status-pending {
-        background-color: #fff3cd;
-        color: #856404;
-    }
-
-    .status-cancelled {
-        background-color: #f8d7da;
-        color: #721c24;
-    }
-
-    /* Footer Section */
-    .footer {
-        margin-top: 30px;
-        padding-top: 20px;
-        border-top: 1px solid #dee2e6;
-        text-align: right;
-        font-size: 10px;
-        color: #6c757d;
-    }
-
-    /* Summary Box */
-    .summary-box {
-        background-color: #f8f9fa;
-        border: 1px solid #dee2e6;
-        border-radius: 8px;
-        padding: 15px;
-        margin-bottom: 20px;
-    }
-
-    .summary-title {
-        font-size: 14px;
-        font-weight: 600;
-        color: #2c5aa0;
-        margin-bottom: 10px;
+    /* Total Row */
+    .total-row td {
+        font-weight: bold;
+        border: 1px solid #333;
+        padding: 10px 8px;
     }
 
     /* Prepared By Section */
     .prepared-by {
-        margin-top: 30px;
+        margin-top: 40px;
         text-align: right;
-        font-size: 12px;
+        font-size: 11px;
     }
 
     .signature-line {
@@ -224,23 +165,29 @@ $css = "
         width: 200px;
         margin-left: auto;
         margin-top: 40px;
+        margin-bottom: 5px;
+    }
+
+    /* Footer Section */
+    .footer {
+        margin-top: 30px;
+        text-align: center;
+        font-size: 10px;
+        color: #666;
     }
 </style>
 ";
 
 // Start building HTML content
 $html = $css;
-$html .= "<div class='header'>";
 
-// Logo at the top (centered)
-$html .= "<div class='logo-container'>";
-$logoPath = '../../assets/images/logo.png';
-if (file_exists($_SERVER['DOCUMENT_ROOT'] . '/furr/assets/images/logo.png')) {
-    $html .= "<img class='logo' src='http://" . $_SERVER['HTTP_HOST'] . "/furr/assets/images/logo.png' alt='Furcare Logo'>";
-} else {
-    $html .= "<div class='logo-fallback'>FC</div>";
-}
+// Top header row with date/time on left and business name on right
+$html .= "<div class='top-header'>";
+$html .= "<div class='top-header-left'>" . date('n/j/y, g:i A') . "</div>";
+$html .= "<div class='top-header-right'>FurCare Pet Grooming</div>";
 $html .= "</div>";
+
+$html .= "<div class='header'>";
 
 // Company name (centered)
 $html .= "<h1 class='company-name'>FURCARE</h1>";
@@ -248,8 +195,7 @@ $html .= "<h1 class='company-name'>FURCARE</h1>";
 // Contact info (centered)
 $html .= "<div class='contact-info'>";
 $html .= "Mabitad Sto. Nino, Panabo City, Davao del Norte<br>";
-$html .= "Email: panabopetgrooming@gmail.com<br>";
-$html .= "Contact: +639700249877";
+$html .= "Email: panabopetgrooming@gmail.com | Contact: +639700249877";
 $html .= "</div>";
 
 $html .= "</div>"; // end header
@@ -279,39 +225,40 @@ if ($report_type === 'appointments') {
 
     $html .= "<div class='summary-box'>";
     $html .= "<div class='summary-title'>Appointment Summary</div>";
-    $html .= "<div style='display: flex; justify-content: space-between;'>";
-    $html .= "<div><strong>Total Appointments:</strong> {$total_appointments}</div>";
-    $html .= "<div><strong>Confirmed:</strong> {$confirmed_count}</div>";
-    $html .= "<div><strong>Total Revenue:</strong> PHP " . number_format($total_revenue, 2) . "</div>";
+    $html .= "<div class='summary-content'>";
+    $html .= "<div class='summary-item'><strong>Total Appointments:</strong> {$total_appointments}</div>";
+    $html .= "<div class='summary-item'><strong>Confirmed:</strong> {$confirmed_count}</div>";
+    $html .= "<div class='summary-item'><strong>Total Revenue:</strong> PHP " . number_format($total_revenue, 2) . "</div>";
     $html .= "</div>";
     $html .= "</div>";
 
     $html .= "<table>";
     $html .= "<tr>
-                <th>Customer</th><th>Contact</th><th>Service</th>
-                <th>Date & Time</th><th>Pet Details</th>
-                <th>Amount</th>
+                <th>CUSTOMER</th><th>CONTACT</th><th>SERVICE</th>
+                <th>DATE & TIME</th><th>PET DETAILS</th>
+                <th>AMOUNT</th>
               </tr>";
 
     foreach ($data as $row) {
-        $status_class = 'status-' . strtolower($row['status']);
         $html .= "<tr>
                     <td><strong>{$row['first_name']} {$row['last_name']}</strong><br>
-                        <small style='color: #666;'>{$row['email']}</small></td>
+                        <span style='font-size: 10px; color: #666;'>{$row['email']}</span></td>
                     <td>{$row['phone']}</td>
-                    <td><strong>{$row['service_name']}</strong></td>
+                    <td>{$row['service_name']}</td>
                     <td>" . formatDate($row['appointment_date']) . "<br>
-                        <small>" . formatTime($row['appointment_time']) . "</small></td>
+                        <span style='font-size: 10px;'>" . formatTime($row['appointment_time']) . "</span></td>
                     <td><strong>{$row['pet_name']}</strong><br>
-                        <small style='color: #666;'>{$row['pet_type']}</small></td>
+                        <span style='font-size: 10px; color: #666;'>{$row['pet_type']}</span></td>
                     <td class='amount'>PHP " . number_format($row['service_price'], 2) . "</td>
                   </tr>";
     }
-} elseif ($report_type === 'sales') {
-    $html .= "<div class='summary-box'>";
-    $html .= "<h2 class='summary-title'>Product Sales Report</h2>";
-    $html .= "<p>Sales overview from " . formatDate($start_date) . " to " . formatDate($end_date) . "</p>";
 
+    // Total Revenue row
+    $html .= "<tr class='total-row'>
+                <td colspan='5' style='text-align: right;'>Total Revenue:</td>
+                <td class='amount'>PHP " . number_format($total_revenue, 2) . "</td>
+              </tr>";
+} elseif ($report_type === 'sales') {
     $categoryLabels = [
         'all' => 'All Sales',
         '1' => 'Pet Food',
@@ -321,12 +268,6 @@ if ($report_type === 'appointments') {
         '5' => 'Pet Treats',
         '6' => 'Pet Apparels'
     ];
-
-    if ($category != 'all') {
-        $categoryLabel = $categoryLabels[$category] ?? 'Unknown';
-        $html .= "<p>Category: " . htmlspecialchars($categoryLabel) . "</p>";
-    }
-    $html .= "</div>";
 
     // Fetch sales data
     if ($category != 'all') {
@@ -378,43 +319,96 @@ if ($report_type === 'appointments') {
 
     $html .= "<div class='summary-box'>";
     $html .= "<div class='summary-title'>Sales Summary</div>";
-    $html .= "<div style='display: flex; justify-content: space-between;'>";
-    $html .= "<div><strong>Total Orders:</strong> {$total_orders}</div>";
-    $html .= "<div><strong>Items Sold:</strong> {$total_items}</div>";
-    $html .= "<div><strong>Total Revenue:</strong> PHP" . number_format($total_revenue, 2) . "</div>";
+    $html .= "<div class='summary-content'>";
+    $html .= "<div class='summary-item'><strong>Total Orders:</strong> {$total_orders}</div>";
+    $html .= "<div class='summary-item'><strong>Items Sold:</strong> {$total_items}</div>";
+    $html .= "<div class='summary-item'><strong>Total Revenue:</strong> PHP " . number_format($total_revenue, 2) . "</div>";
     $html .= "</div>";
     $html .= "</div>";
 
     $html .= "<table>";
     $html .= "<tr>
-                <th>Order Details</th>
-                <th>Date</th>
-                <th>Product</th>
-                <th>Quantity & Price</th>
-                <th>Category</th>
-                <th>Amount</th>
+                <th>ORDER DETAILS</th>
+                <th>DATE</th>
+                <th>PRODUCT</th>
+                <th>QUANTITY & PRICE</th>
+                <th>CATEGORY</th>
+                <th>AMOUNT</th>
               </tr>";
 
     foreach ($sales_data as $sale) {
         $html .= "<tr>
                     <td><strong>#" . str_pad($sale['order_id'], 5, '0', STR_PAD_LEFT) . "</strong><br>
-                        <small class='text-gray-500'>Order ID</small></td>
+                        <span style='font-size: 10px; color: #666;'>Order ID</span></td>
                     <td>" . formatDate($sale['order_date']) . "<br>
-                        <small>" . date('l', strtotime($sale['order_date'])) . "</small></td>
-                    <td><strong>" . htmlspecialchars($sale['product_name']) . "</strong></td>
-                    <td>{$sale['quantity']} × PHP" . number_format($sale['price'], 2) . "<br>
-                        <small>Unit Price</small></td>
-                    <td>" . ($sale['category_name'] ?? 'Uncategorized') . "<br>
-                        <small>Category</small></td>
-                    <td class='amount'>PHP" . number_format($sale['total_amount'], 2) . "</td>
+                        <span style='font-size: 10px;'>" . date('l', strtotime($sale['order_date'])) . "</span></td>
+                    <td>" . htmlspecialchars($sale['product_name']) . "</td>
+                    <td>{$sale['quantity']} × PHP " . number_format($sale['price'], 2) . "<br>
+                        <span style='font-size: 10px; color: #666;'>Unit Price</span></td>
+                    <td>" . ($sale['category_name'] ?? 'Uncategorized') . "</td>
+                    <td class='amount'>PHP " . number_format($sale['total_amount'], 2) . "</td>
                   </tr>";
     }
 
-    $html .= "<tr>
-                <td colspan='5' style='text-align: right; font-weight: bold;'>Total Sales:</td>
-                <td class='amount' style='font-weight: bold;'>PHP" . number_format($total_revenue, 2) . "</td>
+    $html .= "<tr class='total-row'>
+                <td colspan='5' style='text-align: right;'>Total Sales:</td>
+                <td class='amount'>PHP " . number_format($total_revenue, 2) . "</td>
               </tr>";
-    $html .= "</table>";
+} elseif ($report_type === 'orders') {
+    // Get all orders within the date range
+    $sql = "SELECT o.*, u.first_name, u.last_name, u.email, u.phone
+            FROM orders o
+            JOIN users u ON o.user_id = u.id
+            WHERE o.status IN ('confirmed', 'shipped', 'completed')
+            AND o.order_date BETWEEN ? AND ?
+            ORDER BY o.order_date DESC, o.id DESC";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$start_date, $end_date]);
+    $orders_report = $stmt->fetchAll();
+
+    // Calculate summary
+    $total_orders = count($orders_report);
+    $total_revenue = array_sum(array_column($orders_report, 'total_amount'));
+
+    $html .= "<div class='summary-box'>";
+    $html .= "<div class='summary-title'>Order Summary</div>";
+    $html .= "<div class='summary-content'>";
+    $html .= "<div class='summary-item'><strong>Total Orders:</strong> {$total_orders}</div>";
+    $html .= "<div class='summary-item'><strong>Total Revenue:</strong> PHP " . number_format($total_revenue, 2) . "</div>";
+    $html .= "</div>";
+    $html .= "</div>";
+
+    $html .= "<table>";
+    $html .= "<tr>
+                <th>ORDER ID</th><th>CUSTOMER</th><th>ORDER DATE</th>
+                <th>ITEMS</th><th>STATUS</th><th>TOTAL AMOUNT</th>
+              </tr>";
+
+    foreach ($orders_report as $order) {
+        // Get order items count
+        $countStmt = $pdo->prepare("SELECT COUNT(*) as count FROM order_items WHERE order_id = ?");
+        $countStmt->execute([$order['id']]);
+        $item_count = $countStmt->fetch()['count'];
+
+        $html .= "<tr>
+                    <td><strong>#" . str_pad($order['id'], 5, '0', STR_PAD_LEFT) . "</strong></td>
+                    <td><strong>{$order['first_name']} {$order['last_name']}</strong><br>
+                        <span style='font-size: 10px; color: #666;'>{$order['email']}</span></td>
+                    <td>" . formatDate($order['order_date']) . "</td>
+                    <td>{$item_count} item" . ($item_count != 1 ? 's' : '') . "</td>
+                    <td>" . ucfirst($order['status']) . "</td>
+                    <td class='amount'>PHP " . number_format($order['total_amount'], 2) . "</td>
+                  </tr>";
+    }
+
+    $html .= "<tr class='total-row'>
+                <td colspan='5' style='text-align: right;'>Total Revenue:</td>
+                <td class='amount'>PHP " . number_format($total_revenue, 2) . "</td>
+              </tr>";
+    $html .= "<tr class='total-row'>
+                <td colspan='5' style='text-align: right;'>Total Orders:</td>
+                <td class='amount'>{$total_orders}</td>
+              </tr>";
 } elseif ($report_type === 'customers') {
     $stmt = $pdo->prepare("SELECT u.*, 
                           COUNT(a.id) as appointment_count,
@@ -436,26 +430,26 @@ if ($report_type === 'appointments') {
 
     $html .= "<div class='summary-box'>";
     $html .= "<div class='summary-title'>Customer Summary</div>";
-    $html .= "<div style='display: flex; justify-content: space-between;'>";
-    $html .= "<div><strong>Total Customers:</strong> {$total_customers}</div>";
-    $html .= "<div><strong>Average Spent:</strong> PHP " . number_format($avg_spent, 2) . "</div>";
-    $html .= "<div><strong>Total Revenue:</strong> PHP " . number_format($total_revenue, 2) . "</div>";
+    $html .= "<div class='summary-content'>";
+    $html .= "<div class='summary-item'><strong>Total Customers:</strong> {$total_customers}</div>";
+    $html .= "<div class='summary-item'><strong>Average Spent:</strong> PHP " . number_format($avg_spent, 2) . "</div>";
+    $html .= "<div class='summary-item'><strong>Total Revenue:</strong> PHP " . number_format($total_revenue, 2) . "</div>";
     $html .= "</div>";
     $html .= "</div>";
 
     $html .= "<table>";
     $html .= "<tr>
-                <th>Customer</th><th>Contact Information</th><th>Address</th>
-                <th>Appointments</th><th>Orders</th><th>Total Spent</th>
+                <th>CUSTOMER</th><th>CONTACT INFORMATION</th><th>ADDRESS</th>
+                <th>APPOINTMENTS</th><th>ORDERS</th><th>TOTAL SPENT</th>
               </tr>";
 
     foreach ($data as $row) {
         $html .= "<tr>
                     <td><strong>{$row['first_name']} {$row['last_name']}</strong></td>
-                    <td>{$row['email']}<br><small>{$row['phone']}</small></td>
-                    <td><small>{$row['address']}</small></td>
-                    <td style='text-align: center;'>{$row['appointment_count']}</td>
-                    <td style='text-align: center;'>{$row['order_count']}</td>
+                    <td>{$row['email']}<br><span style='font-size: 10px;'>{$row['phone']}</span></td>
+                    <td><span style='font-size: 10px;'>{$row['address']}</span></td>
+                    <td>{$row['appointment_count']}</td>
+                    <td>{$row['order_count']}</td>
                     <td class='amount'>PHP " . number_format($row['total_spent'], 2) . "</td>
                   </tr>";
     }
@@ -463,24 +457,25 @@ if ($report_type === 'appointments') {
 
 $html .= "</table>";
 
-// Prepared by section
+// Prepared by section (signature line only)
 $html .= "<div class='prepared-by'>";
-$html .= "<div>Prepared by:</div>";
 $html .= "<div class='signature-line'></div>";
 $html .= "<div>{$admin_name}</div>";
 $html .= "</div>";
 
 // Footer
 $html .= "<div class='footer'>";
-$html .= "<p>This report was generated automatically by the Furcare Management System.<br>";
-$html .= "Generated on " . date('F j, Y \a\t g:i A') . " | Confidential Business Information</p>";
+$html .= "This report was generated automatically by the Furcare Management System.<br>";
+$html .= "Generated on " . date('F j, Y \a\t g:i A') . " | Confidential Business Information";
 $html .= "</div>";
 
 // Load and render PDF
 $dompdf->loadHtml($html);
-$dompdf->setPaper('A4', 'portrait');
+$dompdf->setPaper('A4', 'landscape');
 $dompdf->render();
 
 // Output PDF to browser
-$dompdf->stream("furcare_report_{$report_type}_" . date('Ymd') . ".pdf", ["Attachment" => true]);
+// If view=true parameter is passed, display in browser; otherwise download
+$view_in_browser = isset($_GET['view']) && $_GET['view'] === 'true';
+$dompdf->stream("furcare_report_{$report_type}_" . date('Ymd') . ".pdf", ["Attachment" => !$view_in_browser]);
 exit();

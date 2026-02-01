@@ -61,9 +61,9 @@ $totalCount = array_sum($statusCounts);
         <!-- Main Content Card -->
         <div class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
             <!-- Status Filter Tabs -->
-            <div class="bg-gradient-to-r from-slate-50 to-blue-50 px-6 py-5 border-b border-slate-200">
+            <div id="filters" class="bg-gradient-to-r from-slate-50 to-blue-50 px-6 py-5 border-b border-slate-200">
                 <div class="flex flex-wrap gap-3">
-                    <a href="?status=all"
+                    <a href="?status=all#filters"
                         class="inline-flex items-center px-5 py-2.5 rounded-xl font-medium transition-all duration-200 <?php echo $status == 'all' ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'; ?>">
                         <i class="fas fa-list mr-2"></i>
                         All Orders
@@ -74,7 +74,7 @@ $totalCount = array_sum($statusCounts);
                             </span>
                         <?php endif; ?>
                     </a>
-                    <a href="?status=payment_review"
+                    <a href="?status=payment_review#filters"
                         class="inline-flex items-center px-5 py-2.5 rounded-xl font-medium transition-all duration-200 <?php echo $status == 'payment_review' ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'; ?>">
                         <i class="fas fa-clock mr-2"></i>
                         Payment Review
@@ -85,7 +85,7 @@ $totalCount = array_sum($statusCounts);
                             </span>
                         <?php endif; ?>
                     </a>
-                    <a href="?status=confirmed"
+                    <a href="?status=confirmed#filters"
                         class="inline-flex items-center px-5 py-2.5 rounded-xl font-medium transition-all duration-200 <?php echo $status == 'confirmed' ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'; ?>">
                         <i class="fas fa-check-circle mr-2"></i>
                         Confirmed
@@ -96,7 +96,7 @@ $totalCount = array_sum($statusCounts);
                             </span>
                         <?php endif; ?>
                     </a>
-                    <a href="?status=cancelled"
+                    <a href="?status=cancelled#filters"
                         class="inline-flex items-center px-5 py-2.5 rounded-xl font-medium transition-all duration-200 <?php echo $status == 'cancelled' ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'; ?>">
                         <i class="fas fa-times-circle mr-2"></i>
                         Cancelled
