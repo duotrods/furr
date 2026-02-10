@@ -143,7 +143,7 @@ $nearExpiryProducts = $nearExpiryStmt->fetchAll();
                         </p>
                         <?php endforeach; ?>
                     </div>
-                    <a href="products.php?filter=near_expiry&expiry_days=7" class="inline-block mt-2 text-sm font-semibold text-yellow-800 hover:text-yellow-900 underline">
+                    <a href="products.php?filter=near_expiry&expiry_days=7#products-table" class="inline-block mt-2 text-sm font-semibold text-yellow-800 hover:text-yellow-900 underline">
                         View all near-expiry products &rarr;
                     </a>
                 </div>
@@ -242,7 +242,7 @@ $nearExpiryProducts = $nearExpiryStmt->fetchAll();
             </div>
 
             <!-- Products Table -->
-            <div class="overflow-x-auto">
+            <div id="products-table" class="overflow-x-auto">
                 <table class="min-w-full">
                     <thead>
                         <tr class="border-b border-gray-200">

@@ -173,7 +173,7 @@ $inventoryFilter = $_GET['inventory_filter'] ?? 'all';
                                     </ul>
                                 </div>
                                 <div class="mt-3">
-                                    <a href="products.php?filter=expired" class="text-sm font-medium text-red-800 hover:text-red-900 underline">
+                                    <a href="products.php?filter=expired#products-table" class="text-sm font-medium text-red-800 hover:text-red-900 underline">
                                         View All Expired Products <i class="fas fa-arrow-right ml-1"></i>
                                     </a>
                                 </div>
@@ -213,7 +213,7 @@ $inventoryFilter = $_GET['inventory_filter'] ?? 'all';
                                     </ul>
                                 </div>
                                 <div class="mt-3">
-                                    <a href="products.php?filter=near_expiry&expiry_days=7" class="text-sm font-medium text-orange-800 hover:text-orange-900 underline">
+                                    <a href="products.php?filter=near_expiry&expiry_days=7#products-table" class="text-sm font-medium text-orange-800 hover:text-orange-900 underline">
                                         View All Expiring Products <i class="fas fa-arrow-right ml-1"></i>
                                     </a>
                                 </div>
